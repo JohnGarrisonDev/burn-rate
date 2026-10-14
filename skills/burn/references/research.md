@@ -27,7 +27,7 @@ Plan on 10–20 points of weekly usage ([budget.md](budget.md)). It usually span
 
 Look for real people describing a real problem. Use web search and page fetches. Good places:
 
-- Reddit and niche forums: "I wish there was", "is there an app that", "I'd pay for", "how do you all handle"
+- Reddit and niche forums: "I wish there was", "is there an app that", "I'd pay for", "how do you all handle". Reddit, Capterra and GetApp often refuse page fetches from agents. When a page won't open, find the same kind of signal somewhere that does, and never count a search snippet as an opened page.
 - Hacker News "Ask HN" threads and Show HN comments
 - 1–3 star app-store reviews of popular apps in a category ("great app but it can't...")
 - Product Hunt comments, Indie Hackers posts, Stack Exchange questions with many views

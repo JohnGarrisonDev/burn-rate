@@ -82,6 +82,8 @@ npx wrangler pages project create <slug> --production-branch main
 npx wrangler r2 bucket create <slug>-files           # see cost hazards first
 ```
 
+Recent wrangler versions (seen with 4.151) can route `pages project create` and `pages deploy` to Workers and fail without a Workers config. If that happens, create the project once with `--force` to keep it a classic Pages project; later deploys work without it. A Pages-only API token can't use the Workers path at all.
+
 Name everything with the project slug as prefix, so the inventory and teardown are obvious. Record each ID in `burn/INFRA.md` right away.
 
 D1 schema changes go through migrations, committed to the repo:

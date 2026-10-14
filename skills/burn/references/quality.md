@@ -27,6 +27,7 @@ An item isn't `done` until all of these that apply are true.
 - **Accessibility:** keyboard reachable, visible focus, labels on inputs, alt text on meaningful images, colour contrast at least 4.5:1 for text. Run axe (via `@axe-core/playwright` or `pa11y`) on changed pages: zero serious or critical issues.
 - **States:** loading, empty, error and success all designed, not left to defaults.
 - **Consistency:** spacing, type and colour from the project's design tokens, not one-off values.
+- **Production headers:** e2e tests run against the security headers production sends. Make the preview server send the host's header file (`_headers`, `vercel.json`, `netlify.toml`). A `<meta>` CSP covers the page but not its workers, so a meta-only setup can pass code that production blocks.
 
 ### Copy and content
 - Follows [style.md](style.md). Specific, true, short.
