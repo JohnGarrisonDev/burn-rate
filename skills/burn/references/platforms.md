@@ -101,6 +101,10 @@ See [budget.md](budget.md). In short: Desktop → `get_usage`; Codex → `usage.
 
 See [notify.md](notify.md). Desktop can use the `PushNotification` tool directly. Everything else goes through `scripts/notify.py` (ntfy, webhook, Pushover).
 
+## Manual-only skills
+
+`burn-teardown` has `disable-model-invocation: true` in its frontmatter. Claude never picks it on its own, and the user runs it as `/burn-teardown`. Codex may ignore that key, so the skill also refuses to run unless the human asked for it in this conversation. Never invoke it from another skill, a scheduled run, or a sub-agent.
+
 ## Windows notes
 
 - Use `python` (or `py`), not `python3`, on Windows.

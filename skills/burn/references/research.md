@@ -19,6 +19,7 @@ Plan on 10–20 points of weekly usage ([budget.md](budget.md)). It usually span
 ### Before you start
 
 - Read `burn/STEERING.md`. If the human said anything about what they want ("something for musicians", "no B2B", "must use Azure"), it's a constraint on every stage.
+- Read every file in `burn/history/`, if there is one. Each is a previous product this project was reset from. Don't propose the same idea again, or a near copy, unless the reset note says the idea was fine and something else failed. Use their lessons.
 - Read the enabled providers in `config.toml`. Running cost is scored against their free tiers.
 - Create `burn/research/YYYY-MM-DD-idea-scorecard.md` (today's date) from the format below, with `Status: stage 1`. If one already exists with a status other than `done`, resume it instead.
 

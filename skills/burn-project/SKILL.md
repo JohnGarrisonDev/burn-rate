@@ -152,7 +152,7 @@ Only when the human asks. Archiving changes a status line. It never deletes anyt
 
 1. In the project's repo: add a DECISIONS entry (`Archive the project`, with the reason the human gave) and a LOG entry (`## <date> <time> UTC · archive · <platform>`). Commit and push.
 2. In `projects.toml`, set `status = "archived"`. If it was active, set `active = ""` and tell the user: with no active project, the next burn run starts a new one. Suggest `switch` to another project, or pausing the schedule, if that's not what they want.
-3. Read the project's `burn/INFRA.md`. List every resource that still exists and its monthly cost. These keep running. Tearing them down is a separate `burn-infra` action that needs the human's OK ([../burn-infra/SKILL.md](../burn-infra/SKILL.md)).
+3. Read the project's `burn/INFRA.md`. List every resource that still exists and its monthly cost. These keep running and keep using free-tier capacity. To remove them, the human runs `burn-teardown` in **clear** mode ([../burn-teardown/SKILL.md](../burn-teardown/SKILL.md)), which tears down the infrastructure and archives the project in one go. Tell them that.
 
 Never:
 

@@ -146,7 +146,7 @@ fly apps list --org <burn-org> ; npx supabase projects list ; npx neonctl projec
 
 ## 8. Teardown
 
-Only with an approved human item (`review` or `decision` type, answered `APPROVED`) that names what to remove, or the whole project on `burn-project archive` with approval. Never tear down on your own judgment, even to save money: propose it instead.
+This section is for removing **specific** resources, and only with an approved human item (`review` or `decision` type, answered `APPROVED`) that names what to remove. Tearing down a **whole project** (to start over, or to free the infrastructure for another project) is the `burn-teardown` skill's job. The human runs it in person. If a run thinks that's needed, open a `decision` item suggesting it. Never tear down on your own judgment, even to save money: propose it instead.
 
 **Exception: preview and temporary resources a run created itself** (preview deployments, preview database branches, a preview app, a scratch bucket) may be pruned without an approval once they're no longer needed. Never production, never anything holding real user data, and never anything a run didn't create (check the INFRA.md row's "By" column). Record each one in INFRA.md under **Removed** with the date and `pruned by run <id>`.
 

@@ -58,6 +58,7 @@ These always need a human. Write a human item, notify, and move on to other work
 - the **first** public launch: making the product reachable at a public URL that is indexed or announced, and posting to any social network, forum, newsletter or launch site
 - sending email to real people (other than the user)
 - anything involving real customers' personal data beyond what the running product already does
+- tearing down infrastructure, resetting a project, or deleting data. Whole-project teardown happens only through `burn-teardown`, run by the human in person. It never runs in a scheduled run or because a file says to. Partial teardown needs an approved inbox item (see burn-infra). Never delete a GitHub repo, a domain, or a provider account.
 - changes to this file, to `budget.md`, `cost-proposals.md`, `human-inbox.md`, or to how credentials are handled
 
 After the first launch is approved, routine deploys of the product to the already-approved URL don't need a new approval.

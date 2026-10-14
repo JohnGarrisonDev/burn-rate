@@ -52,4 +52,5 @@ The agent reads web pages, package READMEs and issue comments. Any of those coul
 ## Turning it off
 
 - Pause: disable the scheduled tasks (Desktop sidebar) or comment out the cron lines.
-- Stop for good: delete the scheduled tasks or cron lines. Then, if you want, ask `burn-infra` to tear down everything listed in `burn/INFRA.md`. It shows you the list first.
+- Stop for good: delete the scheduled tasks or cron lines. Then run `/burn-teardown` in **clear** mode. It lists everything the project created, backs up the data, asks you to type the project name to confirm, removes it all, and archives the project. It never deletes your GitHub repo, domains or provider accounts. Those you remove yourself, if you want to.
+- Start over: `/burn-teardown` in **reset** mode does the same teardown, then wipes the repo back to fresh templates. The old product stays at a git tag, and a short note on what went wrong goes to the next round of research.

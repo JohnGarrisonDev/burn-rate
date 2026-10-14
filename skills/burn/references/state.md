@@ -59,6 +59,7 @@ burn/
   SKILL_PROPOSALS.md proposed skill edits from burn-improve in `suggest` mode
   GUARDRAILS.md      project-specific extra rules (can only tighten)
   research/          research notes and the idea scorecard
+  history/           one file per reset (burn-teardown): what the old product was, why it was reset, lessons
   qa/                weekly QA sweep reports: YYYY-MM-DD-sweep.md
   meetings/          minutes, one file per meeting: YYYY-MM-DD-<topic>.md
   recaps/            one recap per usage week, named by reset date: YYYY-MM-DD.md
@@ -129,4 +130,4 @@ When the code branch merges later, its `burn/` changes are already on the defaul
 
 Only one run at a time per burn home. At the start, if `<burn home>/.lock` exists and is less than 6 hours old, another run is going: stop and say so in your final message. Don't touch the repo; the other run is working in it. If the lock is older, it's stale: delete it and carry on. Write the lock with the current UTC time, platform name and skill name. Delete it as the very last step.
 
-The lock is for skills that change company state: `burn`, `burn-research`, `burn-meeting`, `burn-project`, `burn-infra`, `burn-qa` (when it changes state), `burn-import` and `burn-improve` take it when run on their own (when `burn` calls them mid-run, the run already holds it). Read-only skills (`burn-usage`, `burn-notes` when only showing, `burn-recap` when only showing, `burn-export`) don't need it. `burn-notes` writing an answer just commits a small change; it can skip the lock.
+The lock is for skills that change company state: `burn`, `burn-research`, `burn-meeting`, `burn-project`, `burn-infra`, `burn-qa` (when it changes state), `burn-import`, `burn-improve` and `burn-teardown` take it when run on their own (when `burn` calls them mid-run, the run already holds it). Read-only skills (`burn-usage`, `burn-notes` when only showing, `burn-recap` when only showing, `burn-export`) don't need it. `burn-notes` writing an answer just commits a small change; it can skip the lock.

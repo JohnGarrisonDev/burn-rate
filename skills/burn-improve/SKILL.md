@@ -29,6 +29,7 @@ Never edit these, in any mode:
 - `burn/templates/burn/GUARDRAILS.md`
 - `burn/references/quality.md`, with one exception: you may **add** a Definition of Done line or a check. You may never remove one, lower a threshold (Lighthouse targets, severity rules, accessibility levels), or make the QA review or sweep skippable in more cases.
 - `burn-improve/SKILL.md` (this file)
+- `burn-teardown/SKILL.md` (it deletes things; any change goes through a human item)
 - any text that handles credentials or secrets, wherever it lives:
   - the credential comments and `*_from` / `credential` keys in `burn/templates/config.toml`
   - the auth and credentials sections of `burn/references/providers/*.md` and `burn-infra/SKILL.md`
