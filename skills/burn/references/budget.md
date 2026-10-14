@@ -58,10 +58,11 @@ Check usage again:
 - before starting anything that will take a while (a meeting, a big refactor, a long test suite)
 - whenever you get a rate-limit or overload error
 
-Stop picking up new work when either is true:
+Stop picking up new work when any of these is true:
 
 - weekly % ≥ `stop_new_work_pct`
 - 5-hour % ≥ `five_hour_stop_pct`
+- the session's context is past about 70% (on Claude Desktop, `get_usage` reports it); hand off cleanly and let the next run start fresh
 
 When you stop, always finish properly: commit, push, the log, the retro and the notifications. That's what the reserve between `stop_new_work_pct` and `stop_weekly_pct` is for (about 3 points; about 6 on the last run of the week, which also writes the recap and may hold the retro meeting). The QA review is not part of the reserve: plan room for it before `stop_new_work_pct`. If a task is only half done, either finish it in a few minutes or put it back in the backlog with notes on where you got to. Don't start anything new past `stop_weekly_pct`; if the handoff runs over, keep it short.
 
@@ -72,6 +73,8 @@ Usage readings are account-wide, rounded to whole percents, and can lag a few mi
 ## Rough costs
 
 These are guesses to help with planning. Replace them with real numbers as you see them in your own logs, and put the measured numbers in the log (for a meeting: weekly % before and after, in the LOG entry).
+
+Measured on a Max plan (one project, Oct 2026): S item ≈ 0.2 points, M ≈ 0.5, QA review round ≈ 0.3. Prefer the measured numbers in your LOG.md over this table.
 
 | Work | Roughly |
 |---|---|

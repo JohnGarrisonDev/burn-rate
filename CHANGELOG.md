@@ -4,6 +4,7 @@ Versions follow semver. Patch for fixes, minor for new behavior, major for anyth
 
 ## 0.2.0 · 2026-10-14
 
+- Budget (approved by the maintainer, NH-002): runs also stop taking new work when the session's context passes about 70%; measured Max-plan costs per item added next to the rough-cost table.
 - Quality: the Definition of Done now asks for e2e tests under the same security headers production sends. A `<meta>` CSP doesn't reach workers, so a meta-only preview can pass code that production blocks.
 - Cloudflare: note that recent wrangler versions may route Pages commands to Workers, and that `--force` at project creation keeps a classic Pages project.
 - Research: Reddit, Capterra and GetApp often refuse agent page fetches; find the same signal on a site that opens, and never count a search snippet as an opened page.
