@@ -1,0 +1,10 @@
+name = ""
+slug = ""
+# research | mvp | pre-launch | launched | growth
+phase = "research"
+created = ""
+stack = ""
+repos = []
+urls = { preview = "", production = "" }
+# Set to true only when applying an approved NEEDS_HUMAN item for the first public launch.
+launch_approved = false

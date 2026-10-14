@@ -1,0 +1,141 @@
+# Burn Rate settings.
+# Lives at ~/.burn-rate/config.toml (or $BURN_RATE_HOME/config.toml).
+# Change it with the burn-configure skill, or edit it by hand. Keep the comments.
+# Never put a secret in this file. Credential fields say WHERE a secret lives, not what it is.
+
+version = 1
+
+# claude-desktop | claude-cli | codex
+# burn-setup detects this. It decides how usage is read, how runs are scheduled and how you get notified.
+platform = "claude-desktop"
+
+# Your GitHub user or org. New product repos are created here, always private.
+github_owner = ""
+
+[budget]
+# Where you want weekly usage to end up by the time it resets. 95 leaves a little slack.
+target_end_pct = 95
+# Burns never start, or continue, above this. Raise it only if you never need Claude near the reset.
+hard_stop_pct = 97
+# Stop a run when the 5-hour window reaches this. The next run picks up where it left off.
+five_hour_stop_pct = 90
+# How usage is read: auto | claude-desktop | claude-statusline | codex-sessions | declared
+usage_source = "auto"
+# Only used when usage_source = "declared", or when nothing else works.
+# Each run gets this many minutes of wall-clock work, then wraps up.
+declared_minutes_per_run = 90
+
+[schedule]
+# Runs are placed relative to the weekly reset, so they always land in the last stretch of the week.
+# Each entry is "hours before reset". These are three runs: 36h, 20h and 6h before reset.
+hours_before_reset = [36, 20, 6]
+# Your IANA timezone, for showing times to you. Scheduling itself is relative to the reset.
+timezone = "America/New_York"
+# Set by burn-setup from the platform's usage data, e.g. "Sat 13:59 UTC". Refreshed every run.
+weekly_reset = ""
+
+[autonomy]
+# act: the company decides and ships on its own; only human gates wait for you.
+# propose: it still does the work, but code goes up as PRs and big decisions wait for your OK.
+mode = "act"
+# Allow the agent to create new private GitHub repos for the company when it needs them.
+can_create_repos = true
+
+[git]
+# branch-merge: a branch per run, merged to the default branch when checks pass (default)
+# pr: a branch per run, opened as a PR for you to merge
+# main: commit straight to the default branch
+strategy = "branch-merge"
+
+[meetings]
+enabled = true
+# Most attendees in one meeting, and most rounds of discussion. Meetings cost budget.
+max_attendees = 4
+max_rounds = 2
+# Hold a planning meeting at the start of the first run each week.
+weekly_planning = true
+
+[recap]
+enabled = true
+# Push a notification when the weekly recap is written.
+notify = true
+
+[notify]
+# auto | claude-push | ntfy | webhook | pushover | none
+channel = "auto"
+# Also send a short summary at the end of every run, not just when something needs you.
+run_summaries = true
+# ntfy: pick a long random topic, e.g. burn-7f3k2q9x. Anyone who knows the topic can read it.
+ntfy_server = "https://ntfy.sh"
+ntfy_topic = ""
+# webhook: Discord/Slack-compatible URL. Treat it as a secret: give its location, e.g. "env:BURN_WEBHOOK_URL".
+webhook_url_from = ""
+# pushover: locations of the user key and app token.
+pushover_user_from = ""
+pushover_token_from = ""
+
+[self_improve]
+# off | suggest | local | maintainer
+#   suggest:    retros are written to SKILL_FEEDBACK.md, and proposed edits are written there too
+#   local:      burn-improve edits your installed copy of the skills
+#   maintainer: burn-improve edits a clone of the burn-rate repo and opens a PR (never merges)
+mode = "suggest"
+# For maintainer mode: local path to your clone of the burn-rate repo.
+skills_repo_path = ""
+# Run burn-improve automatically after this many runs. 0 means only when you ask.
+every_n_runs = 3
+# Opt in to filing sanitized suggestions as issues on the upstream burn-rate repo.
+upstream_issues = false
+upstream_repo = ""
+
+# Hosting and services. One table per provider. Only enabled providers are used.
+# credential: where the secret comes from. cli:<tool> means "already logged in with that CLI".
+# monthly_cap_usd: 0 means free tier only. Raised only by approving a cost proposal.
+[providers.github]
+enabled = true
+credential = "cli:gh"
+monthly_cap_usd = 0
+
+[providers.cloudflare]
+enabled = false
+credential = "cli:wrangler"   # or "env:CLOUDFLARE_API_TOKEN"
+account_id_from = ""          # e.g. "env:CLOUDFLARE_ACCOUNT_ID"
+monthly_cap_usd = 0
+
+[providers.azure]
+enabled = false
+credential = "cli:az"
+subscription_id_from = ""     # e.g. "env:AZURE_SUBSCRIPTION_ID". Use a dedicated subscription.
+monthly_cap_usd = 0
+
+[providers.vercel]
+enabled = false
+credential = "cli:vercel"     # or "env:VERCEL_TOKEN"
+monthly_cap_usd = 0
+
+[providers.netlify]
+enabled = false
+credential = "cli:netlify"    # or "env:NETLIFY_AUTH_TOKEN"
+monthly_cap_usd = 0
+
+[providers.fly]
+enabled = false
+credential = "cli:fly"        # or "env:FLY_API_TOKEN"
+monthly_cap_usd = 0
+
+[providers.supabase]
+enabled = false
+credential = "cli:supabase"   # or "env:SUPABASE_ACCESS_TOKEN"
+monthly_cap_usd = 0
+
+[providers.neon]
+enabled = false
+credential = "cli:neonctl"    # or "env:NEON_API_KEY"
+monthly_cap_usd = 0
+
+[providers.stripe]
+# Test mode only until a human approves going live.
+enabled = false
+credential = "cli:stripe"     # or "env:STRIPE_API_KEY" (a test key, sk_test_...)
+live_mode_approved = false
+monthly_cap_usd = 0
