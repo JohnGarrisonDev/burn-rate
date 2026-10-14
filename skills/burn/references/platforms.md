@@ -80,10 +80,18 @@ Show the exact command and get an OK before creating any OS scheduled job.
 Headless command:
 
 ```
-<abs path to codex> exec --full-auto "Use the burn skill to do a scheduled Burn Rate run."
+<abs path to codex> --search exec --skip-git-repo-check --approve-for-me -c sandbox_workspace_write.network_access=true -C <burn home> "Use the burn skill to do a scheduled Burn Rate run." < /dev/null
 ```
 
-Start it in the burn home (`cd ~/.burn-rate`), so the workspace clones are inside Codex's writable sandbox. `--full-auto` runs inside Codex's workspace sandbox with network access governed by the user's Codex config. The run needs network for git, gh and deploys. If Codex's sandbox blocks network, tell the user which setting to change rather than switching to a "dangerous/bypass" mode yourself.
+Tested with codex-cli 0.162. What each flag does:
+
+- `--search` is a top-level flag, so it goes **before** `exec`. It turns on web search, which research and market checks need.
+- `--approve-for-me` runs in the workspace-write sandbox and sends approval requests to Codex's automatic reviewer instead of waiting for a human. Don't combine it with `-s/--sandbox`; Codex rejects the pair. Older Codex versions used `--full-auto` for this. If `codex exec --help` doesn't list `--approve-for-me`, use whichever unattended workspace-write option it does list.
+- `-c sandbox_workspace_write.network_access=true` lets git, gh, npm and deploy CLIs reach the network. The banner should say `(network access enabled)`.
+- `-C <burn home>` starts in the burn home, so the workspace clones are inside the writable sandbox. The burn home isn't a git repo, hence `--skip-git-repo-check`.
+- `< /dev/null` (Windows: `< NUL`): `codex exec` reads extra input from stdin, so close it for scheduled runs.
+
+Never use `--dangerously-bypass-approvals-and-sandbox` for burns. If the sandbox blocks something a run genuinely needs, tell the user which setting to change.
 
 Schedule it with cron or Task Scheduler exactly as for the Claude CLI, swapping the command (full path from `command -v codex` or `where codex`). If the user's Codex install has its own automations feature, it's fine to use that instead. Check `codex --help` for what's available.
 

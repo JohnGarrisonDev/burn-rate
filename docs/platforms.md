@@ -28,7 +28,7 @@ After setup, click "Run now" on one of the tasks once. Any tool approvals you gi
 
 - **Install:** `./install.sh --platform codex` puts the skills in `~/.codex/skills/`.
 - **Usage:** Codex writes your rate limits into its session logs (`~/.codex/sessions/`). Burn Rate reads the newest snapshot. If you haven't used Codex recently, run any short prompt once so there's a fresh one.
-- **Schedule:** cron or Task Scheduler, running `codex exec --full-auto "Use the burn skill to do a scheduled Burn Rate run."` from `~/.burn-rate`, with the full path to `codex`, as for the Claude CLI. Runs need network access for git and deploys. If your Codex sandbox blocks network, setup tells you which setting to change.
+- **Schedule:** cron or Task Scheduler, running `codex --search exec --skip-git-repo-check --approve-for-me -c sandbox_workspace_write.network_access=true -C ~/.burn-rate "Use the burn skill to do a scheduled Burn Rate run."` with the full path to `codex`. That runs in Codex's workspace sandbox with network on and web search enabled, and Codex reviews its own approval requests instead of waiting for you. Setup shows you the exact line before adding it.
 - **Meetings:** Codex sub-agents.
 - **Notifications:** ntfy, a Discord/Slack webhook, or Pushover.
 

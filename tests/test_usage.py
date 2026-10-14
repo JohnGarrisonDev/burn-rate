@@ -23,7 +23,7 @@ CFG = {"budget": {"target_end_pct": 95, "hard_stop_pct": 97, "five_hour_stop_pct
 
 
 def u(weekly, five=0.0, reset=RESET):
-    return usage.finish("provided", NOW, (weekly, reset), (five, None), "")
+    return usage.finish("provided", NOW, (weekly, reset), (five, None), "", now=NOW)
 
 
 class EnvCase(unittest.TestCase):
@@ -229,6 +229,14 @@ class TestPlan(unittest.TestCase):
         self.assertFalse(p["go"])
         self.assertEqual(p["mode"], "time-boxed")
 
+    def test_old_snapshot_rolls_reset_into_the_future(self):
+        now = datetime.now(timezone.utc)
+        r = usage.finish("provided", now - timedelta(days=20), (50.0, now - timedelta(days=16)), (None, None), "")
+        reset = usage.parse_time(r["weekly"]["resets_at"])
+        self.assertGreater(reset, now)
+        self.assertLessEqual(reset - now, timedelta(days=7))
+        self.assertEqual(r["weekly"]["used_pct"], 0.0)
+
     def test_window_that_already_reset_reads_zero(self):
         now = datetime.now(timezone.utc)
         r = usage.finish("provided", now, (80.0, now - timedelta(minutes=1)), (None, None), "")
@@ -241,6 +249,66 @@ class TestParseTime(unittest.TestCase):
         self.assertEqual(usage.parse_time(int(a.timestamp())), a)
         self.assertEqual(usage.parse_time(int(a.timestamp()) * 1000), a)
         self.assertIsNone(usage.parse_time("nonsense"))
+
+
+class TestGate(unittest.TestCase):
+    CFG = {"schedule": {"hours_before_reset": [36, 20, 6]},
+           "budget": {"target_end_pct": 95, "hard_stop_pct": 97, "five_hour_stop_pct": 90}}
+
+    def u(self, weekly, reset, active=True):
+        r = usage.finish("provided", NOW, (weekly, reset), (0.0, None), "", now=NOW)
+        r["window_active"] = active
+        return r
+
+    def test_nothing_due_early_in_the_week(self):
+        res, _ = usage.gate(self.u(10.0, NOW + timedelta(days=5)), self.CFG, "codex", now=NOW)
+        self.assertFalse(res["run"])
+        self.assertIn("next at", res["reason"])
+
+    def test_slot_due_runs_once(self):
+        reset = NOW + timedelta(hours=30)
+        res, st = usage.gate(self.u(10.0, reset), self.CFG, "codex", now=NOW)
+        self.assertTrue(res["run"])
+        self.assertEqual(res["slot"], 36)
+        again, _ = usage.gate(self.u(12.0, reset), self.CFG, "codex", now=NOW + timedelta(hours=1), state=st)
+        self.assertFalse(again["run"])
+
+    def test_missed_slots_collapse_into_one_run(self):
+        res, st = usage.gate(self.u(10.0, NOW + timedelta(hours=5)), self.CFG, "codex", now=NOW)
+        self.assertTrue(res["run"])
+        self.assertEqual(st["done"], [36, 20, 6])
+
+    def test_new_reset_starts_fresh_slots(self):
+        reset = NOW + timedelta(hours=30)
+        _, st = usage.gate(self.u(10.0, reset), self.CFG, "codex", now=NOW)
+        later = NOW + timedelta(days=6, hours=20)
+        res, _ = usage.gate(self.u(0.0, reset + timedelta(days=7)), self.CFG, "codex", now=later, state=st)
+        self.assertTrue(res["run"])
+
+    def test_inactive_codex_window_starts_one(self):
+        res, st = usage.gate(self.u(0.0, NOW + timedelta(days=3), active=False), self.CFG, "codex", now=NOW)
+        self.assertTrue(res["run"])
+        again, _ = usage.gate(self.u(0.0, NOW + timedelta(days=3), active=False), self.CFG, "codex",
+                              now=NOW + timedelta(hours=1), state=st)
+        self.assertFalse(again["run"])
+
+    def test_past_target_doesnt_run(self):
+        res, _ = usage.gate(self.u(96.0, NOW + timedelta(hours=5)), self.CFG, "codex", now=NOW)
+        self.assertFalse(res["run"])
+
+    def test_desktop_never_uses_gate(self):
+        res, _ = usage.gate(self.u(10.0, NOW + timedelta(hours=5)), self.CFG, "claude-desktop", now=NOW)
+        self.assertFalse(res["run"])
+
+    def test_no_reading_doesnt_run(self):
+        res, _ = usage.gate(usage.empty("declared", ""), self.CFG, "claude-cli", now=NOW)
+        self.assertFalse(res["run"])
+
+
+class TestPreview(unittest.TestCase):
+    def test_preview_counts_only_scheduled_slots(self):
+        p = usage.plan(u(17.0, reset=NOW + timedelta(hours=70)), CFG, now=NOW, preview=True)
+        self.assertEqual(p["runs_left_including_this"], 3)
 
 
 if __name__ == "__main__":

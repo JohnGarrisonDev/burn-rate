@@ -81,7 +81,7 @@ Do what `burn-setup` would do for this platform, but only the machine-local part
 
 - **Project instructions file.** If the repo has `CLAUDE.md` but you're on Codex, add an `AGENTS.md` with the same content (or the reverse). Commit it.
 - **Claude Code CLI:** offer the statusline hook (`../burn/scripts/claude_statusline_hook.py`) so usage can be read; install it as `burn-setup` does (absolute path, forward slashes). Check that the allowlist in the burn home's `.claude/settings.json` (runs start there, see [platforms.md](../burn/references/platforms.md)) covers git, gh, python and the enabled provider CLIs. Show changes and get an OK before writing.
-- **Codex:** check that `codex exec --full-auto` has network access in the user's Codex config. If not, tell them which setting to change.
+- **Codex:** use the scheduled command from platforms.md ("Codex"), which turns on network access with `-c sandbox_workspace_write.network_access=true`. Do a short test run and check the banner says `(network access enabled)`.
 - **Claude Desktop:** nothing to install. Remind the user that scheduled tasks only run while the app is open.
 
 ## 7. Check logins and the inbox

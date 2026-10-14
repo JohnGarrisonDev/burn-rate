@@ -9,6 +9,10 @@ Python 3.11+, standard library only.
     python usage.py plan --weekly 61 --resets-at 2026-10-17T13:59:59Z --five-hour 12
                                          # same, with numbers you already have
                                          # (e.g. from Claude Desktop's get_usage tool)
+    python usage.py plan --preview       # what each *scheduled* run would get; this
+                                         # session isn't counted as a run
+    python usage.py gate                 # for run_burn.sh/.ps1: is a scheduled burn due
+                                         # right now? Records the slot it uses.
 
 Sources:
   codex-sessions     newest rate_limits snapshot in ~/.codex/sessions/**/*.jsonl
@@ -24,6 +28,13 @@ Sources:
   (no platform)   the freshest of codex-sessions and claude-statusline
 If the platform's source has nothing, auto falls back to declared. It never reads the
 other platform's numbers: a Codex reading says nothing about a Claude subscription.
+
+gate is for the Claude Code CLI and Codex, whose scheduled jobs run the wrapper hourly.
+It answers {"run": true/false, ...} without starting an agent, so hours with nothing due
+cost no tokens, and the schedule follows the reset even when the reset moves. Codex's
+weekly window starts at the first use after the previous one expires, so its reset
+drifts. When no window is active, a burn is due: it starts the window and spends its
+share. Slots already used for a reset are kept in <burn home>/cache/gate.json.
 
 plan adds stop_weekly_pct (end the run here) and stop_new_work_pct (stop starting new
 work here; the gap is the handoff reserve, about 3 points, or 6 on the last run of the
@@ -183,14 +194,18 @@ def read_claude_statusline():
                   "cached from the Claude Code statusline")
 
 
-def finish(source, observed, weekly, five, note):
-    now = datetime.now(timezone.utc)
+def finish(source, observed, weekly, five, note, now=None):
+    now = now or datetime.now(timezone.utc)
     age = None if observed is None else round((now - observed).total_seconds() / 60, 1)
     w_used, w_reset = weekly
     f_used, f_reset = five
     # A window that has already reset since we observed it is back to 0.
+    active = True
     if w_reset and w_reset <= now:
-        w_used, w_reset = 0.0, w_reset + timedelta(days=7)
+        active = False
+        # Roll forward whole weeks: an old snapshot may be several resets behind.
+        weeks = int((now - w_reset) / timedelta(days=7)) + 1
+        w_used, w_reset = 0.0, w_reset + timedelta(days=7 * weeks)
         note += "; weekly window reset since snapshot"
     if f_reset and f_reset <= now:
         f_used, f_reset = 0.0, None
@@ -198,7 +213,8 @@ def finish(source, observed, weekly, five, note):
     if stale:
         note += f"; snapshot is {int(age)} min old, treat as a lower bound"
     return {"ok": w_used is not None, "source": source, "observed_at": iso(observed),
-            "age_minutes": age, "weekly": window(w_used, w_reset),
+            "age_minutes": age, "window_active": active if w_reset else None,
+            "weekly": window(w_used, w_reset),
             "five_hour": window(f_used, f_reset), "note": note}
 
 
@@ -242,7 +258,7 @@ def load_config():
         return tomllib.load(fh)
 
 
-def plan(usage, cfg, now=None):
+def plan(usage, cfg, now=None, preview=False):
     now = now or datetime.now(timezone.utc)
     b = cfg.get("budget", {})
     target = float(b.get("target_end_pct", 95))
@@ -280,7 +296,8 @@ def plan(usage, cfg, now=None):
     # Runs still to come this week, counting this one. A run counts as "this one" if
     # we're within its slot (later than its start). Unscheduled/manual runs count as one.
     later_slots = [h for h in hours if h < hours_left - 0.5]
-    runs_left = len(later_slots) + 1
+    # In preview (e.g. during setup) this session isn't a run; only scheduled slots count.
+    runs_left = max(1, len(later_slots)) if preview else len(later_slots) + 1
     last = runs_left == 1
     room = max(0.0, target - used)
     allowance = room / runs_left
@@ -305,9 +322,59 @@ def plan(usage, cfg, now=None):
     return out
 
 
+def gate_state_path():
+    return burn_home() / "cache" / "gate.json"
+
+
+def gate(usage, cfg, platform, now=None, state=None):
+    """Decide whether a scheduled burn is due now. Returns (result, new_state)."""
+    now = now or datetime.now(timezone.utc)
+    hours = sorted(cfg.get("schedule", {}).get("hours_before_reset", [36, 20, 6]), reverse=True)
+    state = dict(state or {})
+    reset = parse_time(usage["weekly"]["resets_at"])
+    out = {"now": iso(now), "platform": platform, "source": usage["source"],
+           "weekly_used_pct": usage["weekly"]["used_pct"], "resets_at": iso(reset)}
+
+    if platform == "claude-desktop":
+        out.update(run=False, reason="Claude Desktop runs its own scheduled tasks; the gate isn't used there")
+        return out, state
+    if not usage["ok"] or reset is None:
+        out.update(run=False, reason="no usage reading, so no reset time to schedule against. "
+                   "Run the agent once interactively, or check usage_source")
+        return out, state
+    if usage.get("window_active") is False and platform == "codex":
+        # No weekly window running: a burn starts one. Remember when, so the next
+        # hourly check doesn't fire again before Codex has logged the new window.
+        started = parse_time(state.get("started_window_at"))
+        if started and now - started < timedelta(hours=6):
+            out.update(run=False, reason="a burn started a new window under 6 hours ago; waiting for its snapshot")
+            return out, state
+        state = {"started_window_at": iso(now)}
+        out.update(run=True, slot="window-start", reason="no Codex weekly window is active; a burn starts one")
+        return out, state
+
+    key = reset.strftime("%Y-%m-%dT%H")
+    if state.get("reset") != key:
+        state = {"reset": key, "done": []}
+    hours_left = (reset - now).total_seconds() / 3600
+    due = [h for h in hours if hours_left <= h and h not in state["done"]]
+    if not due:
+        upcoming = [h for h in hours if h not in state["done"] and h < hours_left]
+        when = iso(reset - timedelta(hours=upcoming[0])) if upcoming else None
+        out.update(run=False, hours_until_reset=round(hours_left, 1), next_slot_at=when,
+                   reason="no slot due" + (f"; next at {when}" if when else "; all slots used this week"))
+        return out, state
+    p = plan(usage, cfg, now=now)
+    # Missed slots collapse into one run: mark every due slot as used.
+    state["done"] = sorted(set(state["done"]) | set(due), reverse=True)
+    out.update(run=bool(p["go"]), slot=min(due), hours_until_reset=round(hours_left, 1),
+               reason=p["reason"] if not p["go"] else f"slot {min(due)}h before reset is due; {p['reason']}")
+    return out, state
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("command", nargs="?", default="read", choices=["read", "plan"])
+    ap.add_argument("command", nargs="?", default="read", choices=["read", "plan", "gate"])
     ap.add_argument("--source", default=None,
                     choices=["auto", "codex-sessions", "claude-statusline", "declared"])
     ap.add_argument("--weekly", type=float, help="weekly used %% you already know")
@@ -315,6 +382,8 @@ def main(argv=None):
     ap.add_argument("--five-hour", type=float, help="5-hour used %% you already know")
     ap.add_argument("--platform", choices=PLATFORMS,
                     help="platform for --source auto (default: platform in config.toml)")
+    ap.add_argument("--preview", action="store_true",
+                    help="plan: don't count this session as a run (setup, burn-usage)")
     args = ap.parse_args(argv)
 
     cfg = load_config()
@@ -330,7 +399,21 @@ def main(argv=None):
             source, platform = "auto", "claude-desktop"
         usage = read(source, platform if platform in PLATFORMS else None)
 
-    result = usage if args.command == "read" else plan(usage, cfg)
+    if args.command == "gate":
+        path = gate_state_path()
+        try:
+            state = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            state = {}
+        platform = args.platform or cfg.get("platform")
+        result, state = gate(usage, cfg, platform, state=state)
+        if result.get("run"):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(state), encoding="utf-8")
+    elif args.command == "plan":
+        result = plan(usage, cfg, preview=args.preview)
+    else:
+        result = usage
     json.dump(result, sys.stdout, indent=2)
     print()
     return 0
