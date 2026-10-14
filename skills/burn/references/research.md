@@ -51,6 +51,7 @@ Cut to about 5 that pass the gate. Prefer variety: don't shortlist five versions
 
 Evidence rules:
 
+- Score totals: compute the weighted totals with a quick script (e.g. `python -c` over the scores and the weights below), not by hand. Hand arithmetic drifts.
 - Stage 1 may cite search-result links, marked `(search)`. Stage 2 evidence must be pages you actually opened. If you couldn't open one, don't cite it.
 - Quotes stay short: under 15 words, one per source, in quotation marks. Summarize the rest in your own words.
 - Write the date you checked next to anything that changes (prices, review counts).

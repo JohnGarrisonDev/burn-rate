@@ -38,7 +38,7 @@ Then open your agent and say **"set up burn rate"**. The `burn-setup` skill walk
 | | Claude Desktop | Claude Code CLI | Codex |
 |---|---|---|---|
 | Reads your usage | exactly, built-in | from a statusline hook | from Codex's session logs |
-| Schedules runs with | Desktop scheduled tasks | cron / Task Scheduler | cron / Task Scheduler |
+| Schedules runs with | Desktop scheduled tasks | an hourly cron / Task Scheduler check | an hourly cron / Task Scheduler check |
 | Meetings use | sub-agents | sub-agents | sub-agents |
 | Notifies you via | Desktop push | ntfy, Discord/Slack, Pushover | ntfy, Discord/Slack, Pushover |
 

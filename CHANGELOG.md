@@ -13,3 +13,5 @@ First version.
 - Notifications: Claude Desktop push, ntfy, Discord/Slack webhooks, Pushover.
 - Quality gate: Definition of Done, an independent QA reviewer before every merge, and a weekly QA sweep (Lighthouse, accessibility, links, dependency audit).
 - Install scripts for macOS/Linux and Windows.
+- Hourly scheduling gate (`usage.py gate` + `run_burn.sh` / `run_burn.ps1`) for the Claude Code CLI and Codex. It follows Codex's moving weekly window and costs nothing in hours when no burn is due.
+- Tested end to end on Claude and on Codex (codex-cli 0.162).

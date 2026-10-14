@@ -66,7 +66,9 @@ Get the weekly reset time and record it as `schedule.weekly_reset` (e.g. `"Sat 1
   - Set `statusLine` to `{"type": "command", "command": "python <absolute path to the hook>"}`. Write the path with forward slashes, also on Windows (`C:/Users/...`): Claude Code runs the command through bash, which eats backslashes.
   - The cache fills after their next interactive response. If they decline, runs will be time-boxed instead.
 
-Then run `python ../burn/scripts/usage.py plan` (on Desktop, pass the `get_usage` numbers with `--weekly`/`--resets-at`/`--five-hour`) and show the result, so they see what a run would do this week. This plan counts today's session as a run; scheduled runs each get about (target − used) / slots.
+Then run `python ../burn/scripts/usage.py plan --preview` (on Desktop, pass the `get_usage` numbers with `--weekly`/`--resets-at`/`--five-hour`) and show the result, so they see what each scheduled run would get this week. `--preview` doesn't count this setup session as a run. Drop it if they choose to start research now (step 8), since then this session is a run.
+
+On Codex, mention that the weekly window starts at the first use after the last one expires, so the reset time can move from week to week. The hourly gate (step 7) follows it.
 
 ## 6. Notifications
 
@@ -80,7 +82,7 @@ Work out the run times: take `weekly_reset`, subtract each `hours_before_reset`,
   1. Tasks only run while the app is open, and a missed one runs at the next launch.
   2. Keep the computer awake at those times.
   3. Click "Run now" on one task once, so the tool approvals are saved.
-- **Claude Code CLI / Codex:** show the exact crontab lines or `schtasks` commands, and create them only after a yes. Use the full path to the `claude` or `codex` binary (find it now with `command -v claude`, or `where claude` on Windows) and the flags in platforms.md. For Claude CLI, also propose the permission allowlist from platforms.md for the burn home's `.claude/settings.json`.
+- **Claude Code CLI / Codex:** one hourly job that runs the wrapper (`../burn/scripts/run_burn.sh`, or `run_burn.ps1` on Windows), exactly as in platforms.md ("Claude Code CLI and Codex: one hourly job"). The wrapper's gate decides each hour whether a slot is due, so you don't create a job per slot. On Codex the reset moves, and the gate follows it. Show the exact crontab line or `Register-ScheduledTask` commands and create them only after a yes. If `command -v claude`/`codex` (or `where` on Windows) won't be on the scheduler's PATH, set `BURN_CLAUDE_BIN` / `BURN_CODEX_BIN` in the job. Then test it once by hand: `run_burn.sh` (or `.ps1`) without `--force` should log a `gate:` line to `<burn home>/logs/` saying when the next slot is. For Claude CLI, also propose the permission allowlist from platforms.md for the burn home's `.claude/settings.json`.
 
 Never pick bypass-all-permissions modes for them. If headless runs need broader permissions, explain the trade-off and let them choose.
 
@@ -88,11 +90,11 @@ Never pick bypass-all-permissions modes for them. If headless runs need broader 
 
 Ask: start the company now (research runs in this session, using some of this week's usage), or let the first scheduled run do it?
 
-Either way, create the project now via `../burn-project/SKILL.md` ("new"). This makes the private repo, the workspace clone, the state files and the `projects.toml` entry.
+Either way, take the run lock now ("Run lock" in [state.md](../burn/references/state.md)) and hold it until step 9. Setup changes state from here on. Then create the project via `../burn-project/SKILL.md` ("new"). This makes the private repo, the workspace clone, the state files and the `projects.toml` entry. If they chose to let the scheduled run do research, tell burn-project to **defer research**: it stops after the project is registered, and the first burn run sees `phase = "research"` and starts it.
 
 If they said "now", research runs in this session like a burn run:
 
-1. Take the run lock ("Run lock" in [state.md](../burn/references/state.md)).
+1. You already hold the run lock.
 2. Use the step 5 plan's `stop_new_work_pct` and `stop_weekly_pct` as research's budget. Check usage as research goes ([budget.md](../burn/references/budget.md), step 3).
 3. Go into `../burn-research/SKILL.md` ("called from burn-setup"). Stop at the end of a stage when you reach `stop_new_work_pct`; the next scheduled run resumes.
 4. Write a LOG entry for it: `## <date> <time> UTC · run 1 of 1 · <platform>` with the usage numbers and the research stage reached.

@@ -101,12 +101,15 @@ Scheduled runs start in the burn home and read `active` from `projects.toml`, so
 
 Hand over to [../burn-research/SKILL.md](../burn-research/SKILL.md) for idea research.
 
+- From burn-setup with research deferred: stop here. The first scheduled burn run sees `phase = "research"` and starts it.
 - From a burn run: carry on with research in the same run, inside its budget.
 - From a human: check the budget ([../burn/references/budget.md](../burn/references/budget.md)). Research takes 10–20 points over one or more runs. Tell the user, then start unless they'd rather leave it to the scheduled runs. Either way, the next burn run sees `phase = "research"` and continues it.
 
 ### Rename
 
 Once research has named the product (stage 5 in [../burn/references/research.md](../burn/references/research.md)), give the repo a real name if it has a temporary slug.
+
+The product's display name (`name` in `project.toml` and `projects.toml`) and the repo slug are separate. Always set the display name. Only rename the repo if `autonomy.can_create_repos` is true and the remote is on GitHub; otherwise keep the temporary slug, and note why in the LOG entry.
 
 1. Slugify the name. Check it's free: `gh repo view <owner>/<new-slug>` should fail. If it's taken, try `<new-slug>-app`, then pick something else.
 2. Rename on GitHub. GitHub redirects the old URL, but update everything anyway.

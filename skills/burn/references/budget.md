@@ -65,6 +65,10 @@ Stop picking up new work when either is true:
 
 When you stop, always finish properly: commit, push, the log, the retro and the notifications. That's what the reserve between `stop_new_work_pct` and `stop_weekly_pct` is for (about 3 points; about 6 on the last run of the week, which also writes the recap and may hold the retro meeting). The QA review is not part of the reserve: plan room for it before `stop_new_work_pct`. If a task is only half done, either finish it in a few minutes or put it back in the backlog with notes on where you got to. Don't start anything new past `stop_weekly_pct`; if the handoff runs over, keep it short.
 
+## Measuring what something cost
+
+Usage readings are account-wide, rounded to whole percents, and can lag a few minutes (on Codex they come from the newest session file, which may belong to a sub-agent). So "the meeting cost 2 points" is an observed before/after difference, not a precise attribution. Log it as `observed: 6% → 8%` with the reading times. Don't present it as exact.
+
 ## Rough costs
 
 These are guesses to help with planning. Replace them with real numbers as you see them in your own logs, and put the measured numbers in the log (for a meeting: weekly % before and after, in the LOG entry).

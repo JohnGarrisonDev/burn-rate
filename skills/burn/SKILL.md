@@ -53,7 +53,7 @@ In this order:
 
 ## 4. Plan the run
 
-**First run of the usage week?** That's true if there's no *run* entry (a heading containing `· run `) in LOG.md since the previous reset. Entries from export, import, config, setup or burn-improve don't count. If so, and `meetings.weekly_planning` is on, hold the weekly planning meeting ([references/meetings.md](references/meetings.md), "Weekly planning"). It sets this week's goals and reorders the backlog. Planning should put the top `qa` backlog items near the top: known quality problems come before new features.
+**First run of the usage week?** (Not during `phase = "research"`: research is the week's plan, so skip planning.) That's true if there's no *run* entry (a heading containing `· run `) in LOG.md since the previous reset. Entries from export, import, config, setup or burn-improve don't count. If so, and `meetings.weekly_planning` is on, hold the weekly planning meeting ([references/meetings.md](references/meetings.md), "Weekly planning"). It sets this week's goals and reorders the backlog. Planning should put the top `qa` backlog items near the top: known quality problems come before new features.
 
 **Weekly QA sweep.** If there's no `burn/qa/` sweep since the previous reset and the phase isn't `research`, plan one for this run or the last run of the week ([references/quality.md](references/quality.md), "Weekly QA sweep").
 

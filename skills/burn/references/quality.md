@@ -72,7 +72,7 @@ Before integrating the run branch (step 6 of the `burn` skill), launch a **QA re
 
 **Budget:** a QA review costs roughly 2–4 points. It is not optional. If the run is nearly out of budget, finish fewer items so there's room for review. The only exception is a run that changed nothing in the product: state files only, research or meetings. That run skips the review.
 
-**On Codex or without sub-agents:** follow the fallback in [platforms.md](platforms.md). Take the QA role yourself, re-read the diff from the top as if someone else wrote it, and run every check. Note `QA: self-review (no sub-agent)` in the log.
+**Without sub-agents:** Codex supports sub-agents, so use one there too. Only if this setup can't spawn any, follow the fallback in [platforms.md](platforms.md). Take the QA role yourself, re-read the diff from the top as if someone else wrote it, and run every check. Note `QA: self-review (no sub-agent)` in the log.
 
 ## Weekly QA sweep
 

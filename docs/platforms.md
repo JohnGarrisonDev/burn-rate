@@ -20,7 +20,7 @@ After setup, click "Run now" on one of the tasks once. Any tool approvals you gi
 
 - **Install:** same as Desktop.
 - **Usage:** Claude Code passes your rate limits to the statusline. Setup offers a small hook that saves them to `~/.burn-rate/cache/claude-usage.json` so headless runs can read them. If you already have a statusline, the hook passes everything through to it, so yours looks the same. The numbers refresh whenever you use Claude Code interactively. A headless run may see numbers a few hours old and treats them as a minimum.
-- **Schedule:** cron on macOS/Linux, Task Scheduler on Windows, running `claude -p "Use the burn skill to do a scheduled Burn Rate run." --permission-mode acceptEdits` from `~/.burn-rate`. Cron and Task Scheduler don't load your shell's PATH, so setup writes the full path to `claude` (found with `command -v claude`, or `where claude` on Windows). It shows you the exact lines before adding them.
+- **Schedule:** one job that runs every hour (cron on macOS/Linux, Task Scheduler on Windows) and calls a small wrapper script, `run_burn.sh` or `run_burn.ps1`. Each hour the wrapper checks, without starting Claude, whether one of your burn slots is due. Most hours it isn't, and it exits having cost nothing. When one is, it starts `claude -p "Use the burn skill to do a scheduled Burn Rate run." --permission-mode acceptEdits` in `~/.burn-rate`. Setup shows you the exact job before adding it. Logs go to `~/.burn-rate/logs/`.
 - **Permissions:** headless runs need to use git, gh, npm and your provider CLIs without asking. Runs start in `~/.burn-rate`, and setup proposes an allowlist for `~/.burn-rate/.claude/settings.json` instead of turning permissions off.
 - **Notifications:** ntfy, a Discord/Slack webhook, or Pushover.
 
@@ -28,7 +28,7 @@ After setup, click "Run now" on one of the tasks once. Any tool approvals you gi
 
 - **Install:** `./install.sh --platform codex` puts the skills in `~/.codex/skills/`.
 - **Usage:** Codex writes your rate limits into its session logs (`~/.codex/sessions/`). Burn Rate reads the newest snapshot. If you haven't used Codex recently, run any short prompt once so there's a fresh one.
-- **Schedule:** cron or Task Scheduler, running `codex --search exec --skip-git-repo-check --approve-for-me -c sandbox_workspace_write.network_access=true -C ~/.burn-rate "Use the burn skill to do a scheduled Burn Rate run."` with the full path to `codex`. That runs in Codex's workspace sandbox with network on and web search enabled, and Codex reviews its own approval requests instead of waiting for you. Setup shows you the exact line before adding it.
+- **Schedule:** the same hourly wrapper job as the Claude CLI. This matters more on Codex, because Codex's weekly window starts at your first use after the last one ran out, so the reset day moves around. A fixed weekly schedule would drift; the hourly check just follows it. When a slot is due, the wrapper runs `codex --search exec --skip-git-repo-check --approve-for-me -c sandbox_workspace_write.network_access=true -C ~/.burn-rate "Use the burn skill to do a scheduled Burn Rate run."`. That's Codex's workspace sandbox with network and web search on, with Codex reviewing its own approval requests instead of waiting for you. Tested with codex-cli 0.162.
 - **Meetings:** Codex sub-agents.
 - **Notifications:** ntfy, a Discord/Slack webhook, or Pushover.
 
