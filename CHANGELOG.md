@@ -6,9 +6,10 @@ Versions follow semver. Patch for fixes, minor for new behavior, major for anyth
 
 First version.
 
-- Skills: `burn`, `burn-setup`, `burn-research`, `burn-meeting`, `burn-infra`, `burn-recap`, `burn-notes`, `burn-usage`, `burn-configure`, `burn-project`, `burn-export`, `burn-import`, `burn-improve`.
+- Skills: `burn`, `burn-qa`, `burn-setup`, `burn-research`, `burn-meeting`, `burn-infra`, `burn-recap`, `burn-notes`, `burn-usage`, `burn-configure`, `burn-project`, `burn-export`, `burn-import`, `burn-improve`.
 - Platforms: Claude Desktop, Claude Code CLI, Codex.
 - Usage from Claude Desktop's usage tool, a Claude Code statusline hook, or Codex session logs, with a time-boxed fallback.
 - Hosting provider guides: Cloudflare, Azure, Vercel, Netlify, Fly.io, Supabase, Neon, GitHub, Stripe (test mode).
 - Notifications: Claude Desktop push, ntfy, Discord/Slack webhooks, Pushover.
+- Quality gate: Definition of Done, an independent QA reviewer before every merge, and a weekly QA sweep (Lighthouse, accessibility, links, dependency audit).
 - Install scripts for macOS/Linux and Windows.

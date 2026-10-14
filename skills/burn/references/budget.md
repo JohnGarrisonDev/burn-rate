@@ -71,6 +71,8 @@ These are guesses to help with planning. Replace them with real numbers as you s
 | Small (S) backlog item | 1–2 points |
 | Medium (M) item | 3–5 points |
 | A meeting with 3–4 attendees, 2 rounds | 3–6 points |
+| QA review of a run's work | 2–4 points |
+| Weekly QA sweep | 4–8 points |
 | Research phase for a new project | 10–20 points |
 
 Lower plans burn faster. Measure, don't trust this table.

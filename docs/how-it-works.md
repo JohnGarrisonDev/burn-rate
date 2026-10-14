@@ -24,7 +24,7 @@ The agent remembers nothing between runs. Each run starts cold, reads the `burn/
 3. **Catch up.** Pull the repo. Apply your answers in `NEEDS_HUMAN.md` and your notes in `STEERING.md`. Read the vision, roadmap, backlog, recent log and decisions.
 4. **Plan.** On the first run of the week, hold a planning meeting. Otherwise pick the top backlog items that fit the budget, balanced for the company's phase. An early product gets mostly engineering. A launched one gets a lot more marketing.
 5. **Work.** One item at a time on a branch: build, test, commit, tick it off, check usage. Anything that needs you becomes an inbox item and a push notification. The run doesn't wait for you; it moves on.
-6. **Ship.** Tests and build pass, so merge. Deploy a preview. Deploy to production if you've approved the launch.
+6. **QA, then ship.** A separate QA reviewer (a sub-agent that didn't write the code) reviews the run's work. It runs the tests and the app, checks accessibility and copy, and lists problems by severity. Blockers get fixed or the branch doesn't merge. Once that's clear, merge. Deploy a preview. Deploy to production if you've approved the launch.
 7. **Hand off.** Write the log entry, update the backlog and roadmap, and write a short retro about the skills themselves. On the last run of the week, write the recap.
 8. **Notify.** One short message, if you want them.
 
@@ -33,6 +33,10 @@ The agent remembers nothing between runs. Each run starts cold, reads the `burn/
 When a decision is big enough, such as picking the product, planning the week, pricing, launching or pivoting, the run calls a meeting. The run chairs it. It launches one sub-agent per role (product, engineering, growth, a legal-risk reviewer, and so on), each with its own brief. They come back with positions, argue once more if they disagree, and the chair decides. Minutes go in `burn/meetings/`, decisions in `DECISIONS.md`, action items in the backlog.
 
 Meetings cost quota, so they're capped (4 attendees and 2 rounds by default) and saved for decisions that deserve them.
+
+## Quality
+
+The company works to a written Definition of Done: tests for new behavior, every check green, the UI actually run and looked at on phone and desktop widths, an accessibility scan, copy that follows the style guide, and images that are real, licensed and sized properly. Every run that touches the product gets an independent QA review before it merges. Once a week there's a full sweep of the live product: core flows end to end, Lighthouse scores, broken links, a dependency audit, a read-through of every page. The scores go in the recap so you can see the trend. Before it asks you to approve a public launch, the product has to clear that bar.
 
 ## Research
 

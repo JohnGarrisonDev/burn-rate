@@ -68,6 +68,8 @@ run_summaries = true
 # ntfy: pick a long random topic, e.g. burn-7f3k2q9x. Anyone who knows the topic can read it.
 ntfy_server = "https://ntfy.sh"
 ntfy_topic = ""
+# Only for a protected ntfy server or topic: where the access token lives, e.g. "env:NTFY_TOKEN".
+ntfy_token_from = ""
 # webhook: Discord/Slack-compatible URL. Treat it as a secret: give its location, e.g. "env:BURN_WEBHOOK_URL".
 webhook_url_from = ""
 # pushover: locations of the user key and app token.

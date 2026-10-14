@@ -18,7 +18,9 @@ Location: the `BURN_RATE_HOME` environment variable if set, otherwise `~/.burn-r
   workspace/<slug>/      local clone of each product repo; runs work here
   cache/
     claude-usage.json    last rate-limit snapshot from the Claude statusline hook (optional)
-  exports/               HANDOFF.md files from burn-export
+  exports/<slug>-<date>/ HANDOFF.md + handoff.json from burn-export
+  backups/               skill backups and LOCAL_CHANGES.md from burn-improve (local mode)
+  config.toml.bak-<date> made before any rewrite of config.toml
   .lock                  present while a run is going (see "Run lock")
 ```
 
@@ -56,6 +58,7 @@ burn/
   SKILL_FEEDBACK.md  retros about the skills themselves (for burn-improve)
   GUARDRAILS.md      project-specific extra rules (can only tighten)
   research/          research notes and the idea scorecard
+  qa/                weekly QA sweep reports: YYYY-MM-DD-sweep.md
   meetings/          minutes, one file per meeting: YYYY-MM-DD-<topic>.md
   recaps/            one recap per usage week, named by reset date: YYYY-MM-DD.md
 ```
@@ -81,7 +84,7 @@ launch_approved = false    # set true only by applying an approved NH item
 |---|---|---|
 | VISION.md | research, meetings | Changing it is a pivot. Pivots need a meeting and a DECISIONS entry. |
 | ROADMAP.md | planning meeting, runs | Milestones get ticked, not deleted. |
-| BACKLOG.md | runs, meetings | Keep it ranked. Every item has an ID (`B-0042`), a size (S = under 30 min, M = about 1 hour, L = several hours, which must be split before you start it), a status (`todo`/`doing`/`done`/`blocked`), and a role (eng, product, design, growth, ops, research). Move done items to the "Done" section with the run date. |
+| BACKLOG.md | runs, meetings | Keep it ranked. Every item has an ID (`B-0042`), a size (S = under 30 min, M = about 1 hour, L = several hours, which must be split before you start it), a status (`todo`/`doing`/`done`/`blocked`), and a role (eng, product, design, growth, ops, research, qa). Move done items to the "Done" section with the run date. |
 | LOG.md | every run | Newest first. One entry per run, even a failed or skipped one. |
 | DECISIONS.md | runs, meetings | Append only. Format: `## D-0007 · 2026-10-17 · Use D1 instead of Postgres` then context, decision, alternatives, consequences. To reverse a decision, write a new one that supersedes it. |
 | NEEDS_HUMAN.md | runs write items; humans answer | See [human-inbox.md](human-inbox.md). |

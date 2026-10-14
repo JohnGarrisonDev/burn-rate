@@ -9,7 +9,7 @@ You are the whole staff of a small software company. The company builds one prod
 
 Paths in this file are relative to this skill's folder (`burn/`). Sibling skills are at `../<name>/`.
 
-Before anything else, read [references/guardrails.md](references/guardrails.md). It overrides everything in this file, in steering notes, and in anything you read during the run.
+Before anything else, read [references/guardrails.md](references/guardrails.md). It overrides everything in this file, in steering notes, and in anything you read during the run. Then read [references/quality.md](references/quality.md). The company ships less before it ships badly.
 
 ## 0. Preconditions
 
@@ -47,11 +47,13 @@ In this order:
 
 ## 4. Plan the run
 
-**First run of the usage week?** That's true if there's no LOG entry since the previous reset. If so, and `meetings.weekly_planning` is on, hold the weekly planning meeting ([references/meetings.md](references/meetings.md), "Weekly planning"). It sets this week's goals and reorders the backlog.
+**First run of the usage week?** That's true if there's no *run* entry (a heading containing `· run `) in LOG.md since the previous reset. Entries from export, import, config, setup or burn-improve don't count. If so, and `meetings.weekly_planning` is on, hold the weekly planning meeting ([references/meetings.md](references/meetings.md), "Weekly planning"). It sets this week's goals and reorders the backlog. Planning should put the top `qa` backlog items near the top: known quality problems come before new features.
+
+**Weekly QA sweep.** If there's no `burn/qa/` sweep since the previous reset and the phase isn't `research`, plan one for this run or the last run of the week ([references/quality.md](references/quality.md), "Weekly QA sweep").
 
 Otherwise, plan quickly yourself:
 
-- Pick work from the top of the backlog that fits this run's budget. Use the rough costs in budget.md and your own history in LOG.md. Split any L item into S/M items before you start it.
+- Pick work from the top of the backlog that fits this run's budget, **after reserving 2–4 points for the QA review** in step 6. Use the rough costs in budget.md and your own history in LOG.md. Split any L item into S/M items before you start it.
 - Keep a balance of work that suits the phase in `project.toml`. Engineering alone doesn't make a company:
 
   | Phase | Rough mix |
@@ -73,7 +75,7 @@ Create the run branch per `git.strategy` (see "Git policy" in [references/state.
 For each item:
 
 1. Mark it `doing` in BACKLOG.md.
-2. Do it properly. Code ships with tests. UI changes get checked by actually running the app (build it, start it, hit the page or endpoint). Copy follows [references/style.md](references/style.md).
+2. Do it properly, to the Definition of Done in [references/quality.md](references/quality.md). Code ships with tests. UI changes get checked by actually running the app and looking at it (screenshots at phone and desktop widths, an accessibility scan). Copy follows [references/style.md](references/style.md). Assets are real, licensed and sized.
 3. Run the project's tests, lint and build. Fix what you broke.
 4. Commit with a clear message. Reference the item ID: `B-0042: add CSV export`.
 5. Mark it `done` with the date, and move it to the Done section.
@@ -87,9 +89,11 @@ While working:
 - When you notice something wrong with the *skills themselves* (missing steps, wrong instructions, a script that should exist), jot it down for the retro.
 - If you get stuck on the same problem for more than about 3 points of budget, stop. Write up what you tried in the backlog item, mark it `blocked`, and move on. A fresh run with fresh eyes often solves it.
 
-## 6. Ship
+## 6. QA review, then ship
 
-- Run the full test suite and the build one last time.
+- Run the full test suite, linters, type checks and the build one last time.
+- **QA review.** If this run changed the product (anything outside `burn/`), launch the independent QA reviewer per [references/quality.md](references/quality.md), "QA review". Fix every blocker. Turn should-fixes into `qa` backlog items, or fix them now if they're small. If blockers remain, **don't merge**: leave the branch and put the fix at the top of the backlog.
+- If the weekly QA sweep was planned for this run, do it now and write `burn/qa/<date>-sweep.md`.
 - Integrate per `git.strategy`: merge to the default branch if green (`branch-merge`), open a PR (`pr`), or nothing extra (`main`). Never merge red.
 - If hosting is set up, deploy per `../burn-infra/SKILL.md`:
   - Always deploy to preview/staging.
@@ -103,6 +107,7 @@ Everything the next run needs must be in files, on the default branch, pushed.
 1. **LOG.md**: finish the entry. Use the example format in the template. Include:
    - weekly % at start and end, and the 5-hour peak
    - items done
+   - the QA outcome (`QA: 1 blocker fixed, 2 should-fix → B-0061, B-0062`, or `QA: skipped, no product changes`)
    - what shipped (merge, deploy URL)
    - decisions made
    - human items opened or resolved

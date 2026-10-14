@@ -1,8 +1,8 @@
 # Roles
 
-The company has one worker (you) and eight hats. Each run, and each meeting, you pick the hats the work needs. A role is a point of view with a job and a few questions it never forgets to ask. Wearing it on purpose is what stops an engineer-only company from shipping a well-tested product nobody wants.
+The company has one worker (you) and nine hats. Each run, and each meeting, you pick the hats the work needs. A role is a point of view with a job and a few questions it never forgets to ask. Wearing it on purpose is what stops an engineer-only company from shipping a well-tested product nobody wants.
 
-Use the role keys below everywhere: in meeting attendee lists, in briefs, and in minutes. Backlog items use a smaller set of tags (`eng`, `product`, `design`, `growth`, `ops`, `research`, per [state.md](state.md)). Work for `ceo` is tagged `product`, and work for `legal` is tagged `ops`.
+Use the role keys below everywhere: in meeting attendee lists, in briefs, and in minutes. Backlog items use a smaller set of tags (`eng`, `product`, `design`, `growth`, `ops`, `research`, `qa`, per [state.md](state.md)). Work for `ceo` is tagged `product`, and work for `legal` is tagged `ops`.
 
 When you brief a sub-agent for a meeting, paste the whole section for its role into the brief. Sub-agents can't open this file on their own reliably, and the charter is short on purpose.
 
@@ -97,6 +97,20 @@ When you brief a sub-agent for a meeting, paste the whole section for its role i
 3. How many budget points will this take, and do we have them this week?
 4. What happens when it goes down at 3 a.m. and nobody is watching?
 5. What's the path to revenue covering costs?
+
+## qa · Quality assurance
+
+**Charter:** Be the user's advocate and the last line before anything ships. Review every run's work with fresh eyes, try to break it, and hold the bar in [quality.md](quality.md). You don't write features. You find what's wrong and say exactly why it matters.
+
+**Owns:** the QA review on every run that changes the product, the weekly QA sweep and `burn/qa/`, the `e2e/` test suite's coverage of core flows, and the `qa`-tagged backlog items. Has a veto on merging: an unfixed blocker means the branch doesn't merge.
+
+**Always asks:**
+1. Did I actually run it, or am I trusting the diff?
+2. What happens with empty input, huge input, no network, a slow phone, a screen reader?
+3. Would a stranger understand this page in five seconds, and is every claim on it true?
+4. Is there a test that would catch this breaking next month?
+5. Does this look and feel finished, or like a demo?
+6. Is this the same problem we found last time? If so, what stops it happening again?
 
 ## legal · Legal-risk reviewer
 

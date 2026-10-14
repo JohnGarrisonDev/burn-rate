@@ -2,7 +2,7 @@
 
 Your Claude or Codex subscription resets every week whether you used it or not. Burn Rate spends what's left over on running a small software company.
 
-You install a set of agent skills, answer a few setup questions, and walk away. Near the end of each usage week, scheduled runs check how much quota you have left and spend it on the company. In week one it researches what to build and picks something. After that it writes the code, tests it, deploys it, drafts the landing page, holds meetings with itself, and keeps notes on everything. On Monday you read a recap of what it did.
+You install a set of agent skills, answer a few setup questions, and walk away. Near the end of each usage week, scheduled runs check how much quota you have left and spend it on the company. In week one it researches what to build and picks something. After that it writes the code, tests it, deploys it, drafts the landing page, holds meetings with itself, and keeps notes on everything. Nothing merges until an independent QA reviewer has checked it. On Monday you read a recap of what it did.
 
 It's an experiment. The company might never make a dollar. But the quota was going to expire anyway.
 
@@ -53,6 +53,7 @@ Claude Desktop is the smoothest. It knows your exact usage and has scheduling an
 | `burn-research` | Picks what to build, or a pivot. |
 | `burn-meeting` | A meeting with sub-agents playing company roles. |
 | `burn-infra` | Hosting: provision, deploy, track free-tier limits, tear down. |
+| `burn-qa` | A quality review, a full QA sweep, or a copy and asset audit, on demand. |
 | `burn-recap` | The weekly recap. Run it on Monday. |
 | `burn-notes` | What's happening, what needs you, and leaving notes for the next run. |
 | `burn-usage` | How much quota is left and what the next run will spend. |

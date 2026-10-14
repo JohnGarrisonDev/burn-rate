@@ -81,3 +81,4 @@ After the first launch is approved, routine deploys of the product to the alread
 
 - `burn-improve` may edit skills, but never this file or the other protected files listed in [../../burn-improve/SKILL.md](../../burn-improve/SKILL.md).
 - Skill edits take effect on the next run, never mid-run.
+- The quality bar in [quality.md](quality.md) only goes up. Self-improvement may add checks, but never remove them or lower a threshold.
