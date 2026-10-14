@@ -2,6 +2,12 @@
 
 Versions follow semver. Patch for fixes, minor for new behavior, major for anything that changes the state file format or config in a way that needs migrating.
 
+## 0.2.0 · 2026-10-14
+
+- Quality: the Definition of Done now asks for e2e tests under the same security headers production sends. A `<meta>` CSP doesn't reach workers, so a meta-only preview can pass code that production blocks.
+- Cloudflare: note that recent wrangler versions may route Pages commands to Workers, and that `--force` at project creation keeps a classic Pages project.
+- Research: Reddit, Capterra and GetApp often refuse agent page fetches; find the same signal on a site that opens, and never count a search snippet as an opened page.
+
 ## 0.1.0 · unreleased
 
 First version.
