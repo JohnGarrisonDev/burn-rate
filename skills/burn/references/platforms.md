@@ -34,11 +34,13 @@ Runs are placed relative to the weekly reset: `schedule.hours_before_reset` in c
 
 Scheduled runs start in the **burn home** (the wrapper `cd`s there), never in a project folder. Claude Desktop's scheduled tasks have no working-folder setting, and that's fine: the `burn` skill finds the burn home itself (step 0 of the burn skill is authoritative) and the active project from `projects.toml`, so renaming, switching or adding projects never breaks the schedule.
 
-The prompt every scheduled run uses is the same:
+Every scheduled run on Claude Desktop uses this prompt. It checks the run lock first, before the skill loads, so a run that fires while another is still working skips at almost no cost:
 
 ```
-Use the burn skill to do a scheduled Burn Rate run.
+Before doing anything else, check whether another Burn Rate run is still going. Look for the run lock file `.lock` in the burn home (`$BURN_RATE_HOME` if it's set, otherwise `~/.burn-rate`). If it exists and the start time it records (a `started=` line, or a UTC timestamp on its first line) is less than 6 hours ago, another run is still working: reply with one line, `Skipped: another Burn Rate run has been running since <that time>.`, and stop. Don't load any skill, open the project or change any file. If there's no lock file, or its time is 6 or more hours old (a run that crashed), use the burn skill to do a scheduled Burn Rate run.
 ```
+
+The CLI and Codex wrappers do the same check in `usage.py gate` before they start an agent, so their prompt stays short: `Use the burn skill to do a scheduled Burn Rate run.`
 
 ### Claude Desktop
 

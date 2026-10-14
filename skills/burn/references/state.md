@@ -129,6 +129,14 @@ When the code branch merges later, its `burn/` changes are already on the defaul
 
 ## Run lock
 
-Only one run at a time per burn home. At the start, if `<burn home>/.lock` exists and is less than 6 hours old, another run is going: stop and say so in your final message. Don't touch the repo; the other run is working in it. If the lock is older, it's stale: delete it and carry on. Write the lock with the current UTC time, platform name and skill name. Delete it as the very last step.
+Only one run at a time per burn home. At the start, if `<burn home>/.lock` exists and is less than 6 hours old, another run is going: stop and say so in your final message. Don't touch the repo; the other run is working in it. If the lock is older, it's stale: delete it and carry on. Write the lock as `key=value` lines:
+
+```
+started=2026-10-14T21:05:25Z
+platform=claude-desktop
+skill=burn (scheduled burn-rate-extra-1)
+```
+
+Readers also accept an older lock whose first line is just the UTC time. Delete the lock as the very last step, including when the run stops early. Scheduled runs check the lock before loading any skill (see the scheduled-run prompt in platforms.md), and the hourly gate checks it before starting an agent, so a busy lock costs nothing.
 
 The lock is for skills that change company state: `burn`, `burn-research`, `burn-meeting`, `burn-project`, `burn-infra`, `burn-qa` (when it changes state), `burn-import`, `burn-improve` and `burn-teardown` take it when run on their own (when `burn` calls them mid-run, the run already holds it). Read-only skills (`burn-usage`, `burn-notes` when only showing, `burn-recap` when only showing, `burn-export`) don't need it. `burn-notes` writing an answer just commits a small change; it can skip the lock.

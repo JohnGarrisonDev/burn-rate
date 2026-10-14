@@ -322,11 +322,36 @@ def plan(usage, cfg, now=None, preview=False):
     return out
 
 
+LOCK_STALE = timedelta(hours=6)
+
+
+def lock_started(path=None):
+    """When the current run lock was taken, or None if there's no lock.
+
+    Reads a `started=<UTC>` line, or an older lock whose first line is just the time.
+    An unreadable lock counts as just taken, so it blocks rather than gets ignored.
+    """
+    path = path or burn_home() / ".lock"
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except FileNotFoundError:
+        return None
+    except OSError:
+        return datetime.now(timezone.utc)
+    for line in lines:
+        if line.startswith("started="):
+            t = parse_time(line.split("=", 1)[1])
+            if t:
+                return t
+    t = parse_time(lines[0]) if lines else None
+    return t or datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
+
+
 def gate_state_path():
     return burn_home() / "cache" / "gate.json"
 
 
-def gate(usage, cfg, platform, now=None, state=None):
+def gate(usage, cfg, platform, now=None, state=None, locked_since=None):
     """Decide whether a scheduled burn is due now. Returns (result, new_state)."""
     now = now or datetime.now(timezone.utc)
     hours = sorted(cfg.get("schedule", {}).get("hours_before_reset", [36, 20, 6]), reverse=True)
@@ -337,6 +362,10 @@ def gate(usage, cfg, platform, now=None, state=None):
 
     if platform == "claude-desktop":
         out.update(run=False, reason="Claude Desktop runs its own scheduled tasks; the gate isn't used there")
+        return out, state
+    if locked_since and now - locked_since < LOCK_STALE:
+        # Another run is still working. Don't start an agent, and don't use up a slot.
+        out.update(run=False, reason=f"another Burn Rate run has been running since {iso(locked_since)}")
         return out, state
     if not usage["ok"] or reset is None:
         out.update(run=False, reason="no usage reading, so no reset time to schedule against. "
@@ -406,7 +435,7 @@ def main(argv=None):
         except (OSError, json.JSONDecodeError):
             state = {}
         platform = args.platform or cfg.get("platform")
-        result, state = gate(usage, cfg, platform, state=state)
+        result, state = gate(usage, cfg, platform, state=state, locked_since=lock_started())
         if result.get("run"):
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(json.dumps(state), encoding="utf-8")

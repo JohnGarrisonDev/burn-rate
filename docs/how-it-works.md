@@ -6,7 +6,7 @@ There are three things on your machine and one on GitHub.
 
 1. **The skills.** Folders of instructions (`SKILL.md` files) that Claude or Codex loads when they're relevant. They're installed in `~/.claude/skills/` or `~/.codex/skills/`. `burn` is the main one. It also holds the shared reference docs, templates and helper scripts the other skills use.
 2. **The burn home**, `~/.burn-rate/`. Your settings (`config.toml`), the list of companies (`projects.toml`), a local clone of each company's repo, and some caches. Never committed anywhere.
-3. **The schedule.** A few jobs that start your agent with one sentence: "Use the burn skill to do a scheduled Burn Rate run." On Claude Desktop these are Desktop scheduled tasks. Elsewhere they're cron entries or Windows Task Scheduler tasks.
+3. **The schedule.** A few jobs that start your agent with a short prompt: check that no other burn is still running, then "use the burn skill to do a scheduled Burn Rate run." On Claude Desktop these are Desktop scheduled tasks. Elsewhere they're cron entries or Windows Task Scheduler tasks.
 4. **The company repo**, private, on your GitHub. The product's code, plus a `burn/` folder that is the company's memory.
 
 ## Why everything is in files

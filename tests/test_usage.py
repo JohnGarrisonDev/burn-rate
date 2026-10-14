@@ -305,6 +305,39 @@ class TestGate(unittest.TestCase):
         self.assertFalse(res["run"])
 
 
+class TestLock(unittest.TestCase):
+    CFG = {"schedule": {"hours_before_reset": [36, 20, 6]},
+           "budget": {"target_end_pct": 95, "hard_stop_pct": 97, "five_hour_stop_pct": 90}}
+
+    def u(self, weekly, reset):
+        return usage.finish("provided", NOW, (weekly, reset), (0.0, None), "", now=NOW)
+
+    def test_fresh_lock_blocks_and_keeps_the_slot(self):
+        reset = NOW + timedelta(hours=30)  # the 36h slot is due
+        res, st = usage.gate(self.u(10.0, reset), self.CFG, "codex", now=NOW,
+                             locked_since=NOW - timedelta(minutes=20))
+        self.assertFalse(res["run"])
+        self.assertIn("still", res["reason"].replace("has been running", "still"))
+        # The slot wasn't used up, so the next hourly check can still run it.
+        res2, _ = usage.gate(self.u(10.0, reset), self.CFG, "codex", now=NOW + timedelta(hours=1), state=st)
+        self.assertTrue(res2["run"])
+
+    def test_stale_lock_is_ignored(self):
+        res, _ = usage.gate(self.u(10.0, NOW + timedelta(hours=30)), self.CFG, "codex", now=NOW,
+                            locked_since=NOW - timedelta(hours=7))
+        self.assertTrue(res["run"])
+
+    def test_reads_both_lock_formats(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / ".lock"
+            p.write_text("started=2026-10-14T21:05:25Z\nplatform=claude-desktop\nskill=burn\n", encoding="utf-8")
+            self.assertEqual(usage.iso(usage.lock_started(p)), "2026-10-14T21:05:25Z")
+            p.write_text("2026-10-14T15:15:58Z\ninteractive session\n", encoding="utf-8")
+            self.assertEqual(usage.iso(usage.lock_started(p)), "2026-10-14T15:15:58Z")
+            self.assertIsNone(usage.lock_started(Path(d) / "missing"))
+
+
 class TestPreview(unittest.TestCase):
     def test_preview_counts_only_scheduled_slots(self):
         p = usage.plan(u(17.0, reset=NOW + timedelta(hours=70)), CFG, now=NOW, preview=True)

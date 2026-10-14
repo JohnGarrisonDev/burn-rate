@@ -9,7 +9,7 @@ The best-supported option.
 - **Install:** `./install.sh --platform claude` (or `.\install.ps1 -Platform claude`). Desktop's Code tab and the Claude Code CLI share `~/.claude/skills/`, so this covers both.
 - **Where runs start:** Desktop scheduled tasks have no working-folder setting. That's fine: the `burn` skill finds `~/.burn-rate` (or `BURN_RATE_HOME`) by itself.
 - **Usage:** read directly from the app, so it's exact.
-- **Schedule:** Desktop scheduled tasks, one per run. They show up under "Scheduled" in the sidebar.
+- **Schedule:** Desktop scheduled tasks, one per run. They show up under "Scheduled" in the sidebar. Each one first checks whether another burn is still running and, if so, skips with a one-line note.
 - **Notifications:** Desktop push notifications.
 
 Two things to know. Scheduled tasks only run while the app is open; if it's closed, a missed task runs the next time you open it. And your computer needs to be awake. The app has a keep-awake setting.

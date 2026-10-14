@@ -79,7 +79,7 @@ Send a test: on Desktop, call the `PushNotification` tool; elsewhere run `python
 
 Work out the run times: take `weekly_reset`, subtract each `hours_before_reset`, convert to their local time, and round to the quarter hour. Show the list ("Thu 10:00 PM, Fri 2:00 PM, Sat 4:00 AM") and get a yes. Then create the jobs per platforms.md:
 
-- **Claude Desktop:** one scheduled task per slot, named `burn-rate-run-1`, `-2`, `-3`, with a weekly cron. The scheduled-tasks tool runs cron in the computer's own timezone, not `schedule.timezone`. Convert from `weekly_reset` (UTC) into the system timezone for the cron, and if that differs from `schedule.timezone`, show the times in both. The prompt is `Use the burn skill to do a scheduled Burn Rate run.` Then tell them three things:
+- **Claude Desktop:** one scheduled task per slot, named `burn-rate-run-1`, `-2`, `-3`, with a weekly cron. The scheduled-tasks tool runs cron in the computer's own timezone, not `schedule.timezone`. Convert from `weekly_reset` (UTC) into the system timezone for the cron, and if that differs from `schedule.timezone`, show the times in both. The prompt is the standard scheduled-run prompt from platforms.md ("Scheduling"), which checks the run lock before anything else; copy it exactly Then tell them three things:
   1. Tasks only run while the app is open, and a missed one runs at the next launch.
   2. Keep the computer awake at those times.
   3. Click "Run now" on one task once, so the tool approvals are saved.
