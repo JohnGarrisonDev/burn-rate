@@ -110,7 +110,7 @@ When unsure, it fails. Write the reason in one line.
 | **Monetization** | 15 | A clear way to charge (subscription, one-time purchase, paid tier) that similar products prove works. | No one pays for this; ads are the only option. |
 | **Competition and differentiation** | 15 | Competitors exist (proving demand) but have a gap we can name in one sentence: price, platform, simplicity, a missing feature. | A free, well-loved incumbent does it well, or there's nothing to set us apart. |
 | **Build effort** | 15 | MVP in 1–2 burn weeks. | More than 10 burn weeks. |
-| **Running cost** | 10 | Fits the free tier of an enabled provider at 10 times the expected launch traffic. | Needs paid services from day one. |
+| **Running cost** | 10 | Fits the free tier of an enabled provider at 10 times the expected launch traffic. Check the free tier allows commercial use: Vercel Hobby doesn't, so a paid product there needs a Pro cost proposal before launch, or prefer Cloudflare. | Needs paid services from day one. |
 
 A **burn week** is one usage week of leftover budget, about 8–12 S/M backlog items. Build effort anchors: 5 = 1–2 burn weeks, 4 = 3–4, 3 = 5–6, 2 = 7–10, 1 = more than 10.
 

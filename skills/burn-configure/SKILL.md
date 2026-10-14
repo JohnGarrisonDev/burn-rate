@@ -77,7 +77,7 @@ If the user asks about one area ("what's my schedule?"), show just that. Run `py
 | `recap.enabled`, `recap.notify` | true / false | | |
 | `notify.channel` | `auto` / `claude-push` / `ntfy` / `webhook` / `pushover` / `none` | | Send a test after changing. `ntfy` needs `ntfy_topic`; `webhook` needs `webhook_url_from`; `pushover` needs both `pushover_*_from`. |
 | `notify.run_summaries` | true / false | | New inbox items notify regardless. |
-| `notify.*_from` | a location: `env:NAME`, `keychain:service/account`, `file:path` | | Never the URL or token itself. |
+| `notify.*_from` | a location: `env:NAME` or `file:path` (notify.py doesn't read the keychain) | | Never the URL or token itself. |
 | `self_improve.mode` | `off` / `suggest` / `local` / `maintainer` | yes for `local` and `maintainer` | See "Self-improvement". |
 | `self_improve.every_n_runs` | 0–100 whole runs | | 0 means only when asked. |
 | `self_improve.upstream_issues` | true / false | yes | Needs `upstream_repo` as `owner/repo`. |

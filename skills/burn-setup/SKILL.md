@@ -25,7 +25,7 @@ Look for `config.toml` in the burn home (`$BURN_RATE_HOME` or `~/.burn-rate`). I
    | Python 3.11+ | `python --version` (or `python3`) | Needed for the helper scripts. Point to python.org. |
    | git | `git --version` | Required. |
    | GitHub CLI, logged in | `gh auth status` | Required. Ask them to install it and run `gh auth login`. Product repos are created with it. Needs `repo` scope. |
-   | Provider CLIs | `wrangler --version`, `az version`, `vercel --version`, `netlify --version`, `fly version`, `supabase --version`, `neonctl --version`, `stripe --version` | Optional. Note which exist. |
+   | Provider CLIs | Global: `az version`, `fly version`, `stripe --version`. Project-local or global: `wrangler`, `vercel`, `netlify`, `supabase`, `neonctl` (try the bare command, then `npx --no-install <cli> --version`) | Optional. Note which exist. The project-local ones get installed as dev dependencies in the product repo later, so a missing one isn't a problem. Only the global ones need the user to install them. |
 
 3. For each provider CLI that exists, check the login non-interactively (commands are in [../burn/references/providers/](../burn/references/providers/)). Don't run interactive logins yourself. If they want a provider that isn't logged in, give them the exact command to run.
 
@@ -39,7 +39,7 @@ Ask these together, with defaults filled in:
 2. **Timezone.** Default: detect it from the system.
 3. **When to burn.** Default: three runs at 36, 20 and 6 hours before the weekly reset. Explain in one line what that means in their local time once you know the reset (step 4).
 4. **Autonomy.** `act` (default: it decides and ships; only human gates wait) or `propose` (code goes up as PRs, big calls wait for them).
-5. **Notifications.** On Claude Desktop the default is the built-in push. Elsewhere, ntfy: generate a random topic like `burn-` plus 10 random lowercase letters and digits, and tell them to install the ntfy app and subscribe to it. Or a Discord/Slack webhook (stored as `env:BURN_WEBHOOK_URL`, never in the file), Pushover, or none.
+5. **Notifications.** On Claude Desktop the default is the built-in push. Elsewhere, ntfy: generate a random topic like `burn-` plus 12 random lowercase letters and digits, and tell them to install the ntfy app and subscribe to it. Or a Discord/Slack webhook (stored as `env:BURN_WEBHOOK_URL`, never in the file), Pushover, or none.
 6. **Hosting providers** to enable. Default: the ones whose CLI is installed and logged in. Plus GitHub, always.
 7. **Self-improvement.** Default `suggest`. Mention `local`, and mention `maintainer` for people developing the skills themselves.
 8. **Budget.** Defaults: end the week at 95%, never above 97%. Most people keep these.
