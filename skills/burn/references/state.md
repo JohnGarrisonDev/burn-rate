@@ -18,6 +18,7 @@ Location: the `BURN_RATE_HOME` environment variable if set, otherwise `~/.burn-r
   workspace/<slug>/      local clone of each product repo; runs work here
   cache/
     claude-usage.json    last rate-limit snapshot from the Claude statusline hook (optional)
+  exports/               HANDOFF.md files from burn-export
   .lock                  present while a run is going (see "Run lock")
 ```
 
@@ -59,7 +60,7 @@ burn/
   recaps/            one recap per usage week, named by reset date: YYYY-MM-DD.md
 ```
 
-Templates for each live in [../templates/](../templates/). `burn-setup` and `burn-project new` copy them in.
+Templates for each live in [../templates/burn/](../templates/burn/). `burn-setup` and `burn-project new` copy that whole folder into the repo as `burn/`.
 
 ### project.toml
 
