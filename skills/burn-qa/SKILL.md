@@ -55,4 +55,4 @@ Write the result to `burn/qa/<YYYY-MM-DD>-content.md`. Fix what's quick, and fil
 
 ## Finish
 
-Add a LOG entry: `## <date> · qa · <mode>` with a line on the result. Commit, push, release the lock. If anything rates as a blocker on production, notify the human ([../burn/references/notify.md](../burn/references/notify.md)).
+Add a LOG entry: `## <date> <time> UTC · qa · <platform>`, then a line with the mode and the result. Commit, push, release the lock. If anything rates as a blocker on production, notify the human ([../burn/references/notify.md](../burn/references/notify.md)).

@@ -2,7 +2,7 @@
 
 Your Claude or Codex subscription resets every week whether you used it or not. Burn Rate spends what's left over on running a small software company.
 
-You install a set of agent skills, answer a few setup questions, and walk away. Near the end of each usage week, scheduled runs check how much quota you have left and spend it on the company. In week one it researches what to build and picks something. After that it writes the code, tests it, deploys it, drafts the landing page, holds meetings with itself, and keeps notes on everything. Nothing merges until an independent QA reviewer has checked it. On Monday you read a recap of what it did.
+You install a set of agent skills, answer a few setup questions, and walk away. Near the end of each usage week, scheduled runs check how much quota you have left and spend it on the company. In week one it researches what to build and picks something. After that it writes the code, tests it, deploys it, drafts the landing page, holds meetings with itself, and keeps notes on everything. Nothing merges until a QA review has checked it. On Monday you read a recap of what it did.
 
 It's an experiment. The company might never make a dollar. But the quota was going to expire anyway.
 
@@ -66,7 +66,7 @@ Claude Desktop is the smoothest. It knows your exact usage and has scheduling an
 
 Some things it can't do, and some it's not allowed to:
 
-- **Spend your money.** It starts on free tiers. When it outgrows one, it writes you a cost proposal and waits. If you approve, that becomes a hard monthly cap.
+- **Spend your money.** It starts on free tiers. When it outgrows one, it writes you a cost proposal and waits. If you approve, that becomes a monthly cap the agent stays under. Set a billing alert at the provider too.
 - **Touch your subscription.** It never turns on extra usage. It never runs past 97% of your week (you can change that), so you're never locked out on reset morning.
 - **Make accounts or sign in with passwords.** If it needs a Cloudflare account or a domain, it asks you.
 - **Launch publicly without you.** The first public launch, social posts, and emailing real people all need your OK.

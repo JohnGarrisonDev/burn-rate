@@ -3,8 +3,12 @@
 #
 #   ./install.sh --platform claude            # user-wide: ~/.claude/skills
 #   ./install.sh --platform codex             # user-wide: ~/.codex/skills
-#   ./install.sh --platform claude --scope project --project /path/to/repo
+#   ./install.sh --platform claude --scope project --project /path/to/folder
 #   ./install.sh --platform codex --link      # symlink instead of copy (handy if you hack on the skills)
+#
+# Use user scope. Scheduled runs start in the burn home (~/.burn-rate), so project scope
+# only works if that project folder is your burn home.
+# On Windows (Git Bash), --link needs native symlinks; install.ps1 -Link is simpler there.
 #
 # Running it again updates the skills in place. It only touches folders named burn*.
 
@@ -14,9 +18,10 @@ platform=""
 scope="user"
 project="$(pwd)"
 mode="copy"
+windows_link=""
 
 usage() {
-  sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'
   exit "${1:-0}"
 }
 
@@ -41,6 +46,18 @@ case "$platform" in
 esac
 
 src="$(cd "$(dirname "$0")" && pwd)/skills"
+
+if [ "$mode" = "link" ]; then
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      # Git Bash's ln -s copies by default. Ask for a real symlink, and fail if it can't make one.
+      MSYS=winsymlinks:nativestrict
+      CYGWIN=winsymlinks:nativestrict
+      export MSYS CYGWIN
+      windows_link=1 ;;
+  esac
+fi
+
 mkdir -p "$dest"
 
 for skill in "$src"/burn*; do
@@ -48,7 +65,13 @@ for skill in "$src"/burn*; do
   target="$dest/$name"
   rm -rf "$target"
   if [ "$mode" = "link" ]; then
-    ln -s "$skill" "$target"
+    if ! ln -s "$skill" "$target"; then
+      if [ -n "${windows_link:-}" ]; then
+        echo "Couldn't make a symlink. Windows needs Developer Mode (or an admin shell) for that."
+        echo "Use the PowerShell installer instead: .\\install.ps1 -Platform $platform -Link"
+      fi
+      exit 1
+    fi
     echo "linked  $name -> $target"
   else
     cp -R "$skill" "$target"

@@ -111,6 +111,28 @@ class SecretTests(unittest.TestCase):
         cfg["github_owner"] = "ghp_" + "a" * 36
         self.assertTrue(any("looks like a secret" in e for e in errors_for(cfg)))
 
+    def test_notify_locations_are_env_or_file_only(self):
+        for bad in ("cli:gh", "keychain:burn/webhook", "env:", "env:1BAD", "file:", "plain-value"):
+            cfg = base()
+            cfg["notify"]["webhook_url_from"] = bad
+            self.assertTrue(any("notify.webhook_url_from" in e for e in errors_for(cfg)), bad)
+        cfg = base()
+        cfg["notify"]["ntfy_token_from"] = "keychain:ntfy/token"
+        self.assertTrue(any("notify.ntfy_token_from" in e for e in errors_for(cfg)))
+        for good in ("env:BURN_WEBHOOK_URL", "file:~/.burn-rate/webhook.txt"):
+            cfg = base()
+            cfg["notify"]["webhook_url_from"] = good
+            self.assertEqual(errors_for(cfg), [], good)
+
+    def test_file_locations_may_contain_spaces(self):
+        cfg = base()
+        cfg["notify"]["pushover_user_from"] = r"file:C:\Users\Jane Doe\.burn-rate\pushover user.txt"
+        cfg["notify"]["pushover_token_from"] = "file:/home/jane/My Secrets/pushover-token"
+        cfg["providers"]["cloudflare"]["account_id_from"] = "file:~/Cloud Stuff/account id"
+        self.assertEqual(errors_for(cfg), [])
+        cfg["providers"]["cloudflare"]["credential"] = "env:HAS SPACE"
+        self.assertTrue(any("providers.cloudflare.credential" in e for e in errors_for(cfg)))
+
     def test_ntfy_needs_topic(self):
         cfg = base()
         cfg["notify"]["channel"] = "ntfy"
@@ -150,7 +172,7 @@ class GatedChangeTests(unittest.TestCase):
         self.assertTrue(any("gated change" in e for e in errors_for(new, previous=old)))
         errors, warnings = cc.check(new, previous=old, allow_gated=True)
         self.assertEqual(errors, [])
-        self.assertTrue(any("monthly_cap_usd" in w for w in warnings))
+        self.assertTrue(any("monthly_cap_usd" in w and "NEEDS_HUMAN" in w for w in warnings))
 
     def test_lowering_is_not_gated(self):
         old = base()

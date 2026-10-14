@@ -8,8 +8,10 @@ Python 3.11+, standard library only.
     python config_check.py new.toml --previous old.toml
                                                    # also flags gated changes between the two
     python config_check.py new.toml --previous old.toml --allow-gated
-                                                   # gated changes become warnings (only when
-                                                   # the user asked for them in person)
+                                                   # gated changes become warnings. Valid only
+                                                   # when the user asked for the change in
+                                                   # person, or when applying an answered
+                                                   # NEEDS_HUMAN item that approved it
 
 Prints one line per problem ("error: ..." or "warning: ...") and a summary line.
 Exit code 1 if there is any error, 0 otherwise.
@@ -33,7 +35,9 @@ AUTONOMY = {"act", "propose"}
 GIT_STRATEGIES = {"branch-merge", "pr", "main"}
 CHANNELS = {"auto", "claude-push", "ntfy", "webhook", "pushover", "none"}
 IMPROVE_MODES = {"off", "suggest", "local", "maintainer"}
-LOCATION_RE = re.compile(r"^(env:[A-Za-z_][A-Za-z0-9_]*|cli:[A-Za-z0-9_.-]+|keychain:\S+|file:\S+)$")
+LOCATION_RE = re.compile(r"^(env:[A-Za-z_][A-Za-z0-9_]*|cli:[A-Za-z0-9_.-]+|keychain:\S+|file:.+)$")
+# notify.py reads only env: and file: locations.
+NOTIFY_LOCATION_RE = re.compile(r"^(env:[A-Za-z_]\w*|file:.+)$", re.ASCII)
 REPO_RE = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
 SECRET_PATTERNS = [
     re.compile(r"sk_(live|test)_[A-Za-z0-9]{8,}"),
@@ -119,14 +123,22 @@ class Checker:
             return None
         return value
 
-    def location(self, key, required=False):
-        """A credential location like env:NAME or cli:gh. Empty is allowed unless required."""
+    def location(self, key, required=False, notify=False):
+        """A credential location like env:NAME or cli:gh. Empty is allowed unless required.
+
+        notify=True allows only env:NAME and file:path, the two kinds notify.py can read.
+        """
         value = self.string(key, required=required)
         if not value:
             if required:
                 self.err(key, "empty; say where the credential lives, e.g. env:NAME or cli:tool")
             return value
-        if not LOCATION_RE.match(value):
+        if notify:
+            if not NOTIFY_LOCATION_RE.match(value):
+                self.err(key, f"{value!r} is not a notify credential location (env:NAME or "
+                              "file:path). Never put the value itself here")
+                return None
+        elif not LOCATION_RE.match(value):
             self.err(key, f"{value!r} is not a credential location (env:NAME, cli:tool, "
                           "keychain:service/account or file:path). Never put the value itself here")
             return None
@@ -208,15 +220,15 @@ class Checker:
             self.err("notify.ntfy_topic", "channel is ntfy but no topic is set")
         if topic and len(topic) < 12:
             self.warn("notify.ntfy_topic", "short topics are easy to guess; use a long random one")
-        webhook = self.location("notify.webhook_url_from")
+        webhook = self.location("notify.webhook_url_from", notify=True)
         if channel == "webhook" and not webhook:
             self.err("notify.webhook_url_from", "channel is webhook but no location is set")
         for key in self.get("notify") or {}:
             if key.endswith("_from") and key not in ("webhook_url_from", "pushover_user_from",
                                                      "pushover_token_from"):
-                self.location(f"notify.{key}")
-        user = self.location("notify.pushover_user_from")
-        token = self.location("notify.pushover_token_from")
+                self.location(f"notify.{key}", notify=True)
+        user = self.location("notify.pushover_user_from", notify=True)
+        token = self.location("notify.pushover_token_from", notify=True)
         if channel == "pushover" and not (user and token):
             self.err("notify.pushover_user_from", "channel is pushover but user/token locations are missing")
 
@@ -311,7 +323,8 @@ def check(cfg, previous=None, allow_gated=False):
     if previous is not None:
         for change in gated_changes(previous, cfg):
             if allow_gated:
-                c.warnings.append(f"warning: gated change (user asked in person): {change}")
+                c.warnings.append(f"warning: gated change (allowed: the user asked in person "
+                                  f"or an answered NEEDS_HUMAN item approved it): {change}")
             else:
                 c.errors.append(f"error: gated change: {change}. Only the user, interactively, "
                                 "or an approved NEEDS_HUMAN item may do this")
@@ -328,7 +341,8 @@ def main(argv=None):
     ap.add_argument("path", nargs="?", help="config file (default: burn home config.toml)")
     ap.add_argument("--previous", help="the config before the change, to catch gated changes")
     ap.add_argument("--allow-gated", action="store_true",
-                    help="the user asked for the gated change in person; report it as a warning")
+                    help="the user asked for the gated change in person, or an answered "
+                         "NEEDS_HUMAN item approved it; report it as a warning")
     args = ap.parse_args(argv)
 
     path = Path(args.path).expanduser() if args.path else burn_home() / "config.toml"

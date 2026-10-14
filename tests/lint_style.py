@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Flag writing that reads as machine-made in the public docs.
 
-Checks README.md, CONTRIBUTING.md, CHANGELOG.md, docs/**/*.md and skills/*/README.md for:
+Checks README.md, CONTRIBUTING.md, CHANGELOG.md and docs/**/*.md for:
   - words and phrases from the banned list in skills/burn/references/style.md
   - more than one em dash in a paragraph
   - emoji in headings
@@ -22,7 +22,8 @@ BANNED = [
     "unlock", "unleash", "empower", "supercharge", "game-changer", "game changer",
     "cutting-edge", "revolutionize", "harness", "streamline", "effortless", "effortlessly",
     "embark", "tapestry", "testament", "it's worth noting", "in conclusion",
-    "in today's", "fast-paced", "comprehensive guide", "look no further",
+    "in today's", "fast-paced", "comprehensive", "look no further",
+    "crucial", "pivotal", "journey", "landscape", "realm",
 ]
 OPENERS = re.compile(r"^(welcome to|in this (guide|article|post)|are you tired of)", re.I)
 EMOJI = re.compile("[\U0001F300-\U0001FAFF☀-➿]")
@@ -31,7 +32,6 @@ EMOJI = re.compile("[\U0001F300-\U0001FAFF☀-➿]")
 def public_files():
     files = [ROOT / n for n in ("README.md", "CONTRIBUTING.md", "CHANGELOG.md")]
     files += sorted((ROOT / "docs").rglob("*.md"))
-    files += sorted((ROOT / "skills").glob("*/README.md"))
     return [f for f in files if f.is_file()]
 
 

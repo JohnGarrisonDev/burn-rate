@@ -13,6 +13,8 @@ Paths here are relative to this skill's folder. Read [../burn/references/guardra
 
 Read the provider file before you touch that provider in a run. Don't work from memory: CLIs and limits change.
 
+**Run lock.** When `burn` calls this skill mid-run, the run already holds the lock. When the user runs it on its own, take the lock per "Run lock" in [../burn/references/state.md](../burn/references/state.md) before changing anything (if a run holds it, tell the user and stop), and release it when you're done.
+
 ## Ground rules
 
 - Only use providers with `enabled = true` in `config.toml` **and** a passing auth check this run.
@@ -95,6 +97,7 @@ IDs aren't secrets; connection strings and keys are. Put IDs in INFRA.md, never 
 Called from step 6 of `../burn/SKILL.md`, after tests and build pass.
 
 - **Preview, always.** Deploy every green run to a preview URL (preview branch, draft deploy, preview environment, or a separate preview app; see the provider file). Smoke-test it: fetch the main page and one API route, check the status codes and that the page isn't an error page. Write the URL in LOG.md and `urls.preview` in `burn/project.toml`.
+- **Not indexed before launch.** Until `launch_approved = true`, every non-production deploy (and any production-like URL that exists before launch) sends `X-Robots-Tag: noindex` on every response, or serves a `robots.txt` with `Disallow: /`. Set it in the IaC (`_headers`, `vercel.json` headers, `netlify.toml` headers, `staticwebapp.config.json`, or the app itself) and check it in the smoke test (`curl -sI <url>` shows the header, or `curl -s <url>/robots.txt`).
 - **Production, only when `launch_approved = true`** in `burn/project.toml` and the merge to the default branch went in green. Before approval, production doesn't exist or isn't announced. Attaching a custom domain, publishing GitHub Pages, or connecting a production branch to auto-deploy all count as launching.
 - After a production deploy, smoke-test the production URL the same way. If it's broken, roll back with the provider's rollback or by redeploying the previous commit, then open a `blocker` item if you can't fix it this run.
 - Database migrations run against preview first, then production, never edited by hand in a dashboard.
@@ -108,7 +111,7 @@ Product secrets go into the provider's secret store, from env vars the human set
 printf %s "$STRIPE_SECRET_KEY" | npx wrangler secret put STRIPE_SECRET_KEY
 ```
 
-PowerShell: `$env:STRIPE_SECRET_KEY | npx wrangler secret put STRIPE_SECRET_KEY`.
+On Windows, use this form from Git Bash, not PowerShell. Windows PowerShell 5.1 adds a trailing newline when it pipes a string to a program, and the newline ends up inside the secret, which breaks it in ways that are hard to spot.
 
 - If the env var isn't set, open a `secret` item naming the variable, where to get the value, and the minimum scope. Never invent a placeholder secret in production.
 - Preview environments get test or sandbox keys. Live payment keys only after `live_mode_approved = true`, and only set by the human or from an env var they set for that purpose.
@@ -144,6 +147,8 @@ fly apps list --org <burn-org> ; npx supabase projects list ; npx neonctl projec
 ## 8. Teardown
 
 Only with an approved human item (`review` or `decision` type, answered `APPROVED`) that names what to remove, or the whole project on `burn-project archive` with approval. Never tear down on your own judgment, even to save money: propose it instead.
+
+**Exception: preview and temporary resources a run created itself** (preview deployments, preview database branches, a preview app, a scratch bucket) may be pruned without an approval once they're no longer needed. Never production, never anything holding real user data, and never anything a run didn't create (check the INFRA.md row's "By" column). Record each one in INFRA.md under **Removed** with the date and `pruned by run <id>`.
 
 1. Run the drift check first so the list is complete.
 2. Export data that matters (database dump, uploaded files) to a place the human chose. Never commit dumps with personal data.

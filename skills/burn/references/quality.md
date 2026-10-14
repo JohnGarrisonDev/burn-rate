@@ -50,7 +50,7 @@ Before integrating the run branch (step 6 of the `burn` skill), launch a **QA re
 - the diff: `git diff <default-branch>...HEAD`, or for a large diff, `--stat` plus the most important files
 - how to run the tests and the app
 - this file's Definition of Done
-- these instructions: "Review only. Don't edit files or commit. Return findings as a list, each with: severity (blocker / should-fix / nit), file:line, what's wrong, and why it matters to a user or maintainer. Run the tests and the app yourself where you can. Don't report style preferences the linter would catch. If it's good, say so in one line."
+- these instructions: "Review only. Don't edit files or commit. Return findings as a list, each with: severity (blocker / should-fix / nit), file:line, what's wrong, and why it matters to a user or maintainer. Cite line numbers from the working tree, not from the diff. Run the tests and the app yourself where you can. Don't report style preferences the linter would catch. If it's good, say so in one line."
 
 **What counts as a blocker:**
 - broken behavior
@@ -66,6 +66,7 @@ Before integrating the run branch (step 6 of the `burn` skill), launch a **QA re
 - Fix every blocker, re-run the checks, and if the fix was more than trivial, ask the reviewer to look again (once).
 - `should-fix` items: fix them now if they're small. Otherwise add them to BACKLOG.md near the top, tagged `qa`.
 - Ignore nits unless they're free to fix.
+- Save the findings, as returned, to `burn/qa/<YYYY-MM-DD>-review-run-<n>.md`, with a line under each saying what you did about it.
 - Record the outcome in the run's LOG entry: `QA: 2 blockers fixed, 1 should-fix → B-0061`.
 - If blockers can't be fixed this run, **don't merge**. Leave the branch, put the fix at the top of the backlog, and say so in the log.
 
@@ -94,11 +95,20 @@ Write results to `burn/qa/<YYYY-MM-DD>-sweep.md`:
 
 New findings go into the backlog tagged `qa`. The weekly recap includes a "Quality" section with the scores and their trend.
 
+## Small or early projects
+
+The checks above still apply on day one; some just look different.
+
+- **No linter, formatter or type checker yet?** Adding them is part of the scaffold item, not a later nice-to-have.
+- **No hosting yet?** Serve the build locally (e.g. `npx serve .`) and run the sweep against localhost.
+- **No dependencies?** Record `audit: no dependencies` instead of running an audit.
+- **Playwright and axe** are project-local dev dependencies. It's fine to add them with the first real UI, not before. Until then, say what wasn't checked in the QA line: `QA: self-review; no axe yet (no UI)`.
+
 ## Quality before launch
 
 The first public launch item in NEEDS_HUMAN.md must include the latest sweep results. Don't ask for launch approval with open blockers, Lighthouse scores under target, or missing legal pages, favicon or social preview.
 
 ## Keep the bar where it is
 
-- Don't lower a threshold, skip a check or delete a failing test to make a run look productive. If a threshold is genuinely wrong for this product, change it with a DECISIONS entry that explains why.
+- Don't lower a threshold, skip a check or delete a failing test to make a run look productive. If a threshold is genuinely wrong for this product, open a `review` item ([human-inbox.md](human-inbox.md)) that says which threshold, why, and the value you propose. Keep the current threshold until the human answers. Then record the outcome in DECISIONS.
 - If the same kind of problem shows up in QA review twice, make it impossible the third time: a lint rule, a test, a checklist line here (via SKILL_FEEDBACK and burn-improve), or a shared component.

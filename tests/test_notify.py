@@ -40,6 +40,29 @@ class TestSecretDetection(unittest.TestCase):
             with self.subTest(s=s):
                 self.assertIsNotNone(notify.find_secret(s))
 
+    def test_flags_webhook_urls(self):
+        samples = [
+            "hook is https://discord.com/api/webhooks/1234567890/AbCdEf-ghIJ",
+            "https://discordapp.com/api/webhooks/1/x",
+            "https://ptb.discord.com/api/webhooks/1/x",
+            "posted to https://hooks.slack.com/services/T000/B000/XXXXXXXX",
+        ]
+        for s in samples:
+            with self.subTest(s=s):
+                self.assertEqual(notify.find_secret(s), "webhook URL")
+        for s in ("see https://discord.com/channels/1/2", "https://slack.com/help/articles/1",
+                  "Set up a Discord webhook (BURN_WEBHOOK_URL)"):
+            with self.subTest(s=s):
+                self.assertIsNone(notify.find_secret(s))
+
+    def test_main_refuses_a_webhook_url_in_the_message(self):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = notify.main(["--title", "t", "--message",
+                                "new hook: https://hooks.slack.com/services/T0/B0/abcdef"])
+        self.assertEqual(code, 1)
+        self.assertNotIn("hooks.slack.com", out.getvalue())
+
     def test_ignores_normal_messages(self):
         samples = [
             "NH-007 (cost): Cloudflare D1 will hit its free row limit in ~2 weeks",
@@ -199,6 +222,15 @@ class TestMain(unittest.TestCase):
         self.assertEqual(out["channel"], "claude-push")
         self.assertFalse(out["delivered"])
         self.assertIn("PushNotification", out["note"])
+        send.assert_not_called()
+
+    def test_claude_push_dry_run(self):
+        self.write_config('platform = "claude-desktop"\n[notify]\nchannel = "auto"\n')
+        code, out, send = self.run_main("--dry-run")
+        self.assertEqual(code, 0)
+        self.assertEqual(out["channel"], "claude-push")
+        self.assertTrue(out["dry_run"])
+        self.assertFalse(out["delivered"])
         send.assert_not_called()
 
     def test_missing_env_credential_exits_2(self):

@@ -55,7 +55,7 @@ With no payment method on file, Actions stops when the minutes run out. With one
 gh api /users/<user>/settings/billing/usage --jq '.usageItems[] | select(.product=="actions") | {date, quantity, unitType, netAmount}'
 ```
 
-This is the enhanced billing API; it needs the `user` scope (`gh auth refresh -s user`). Older accounts may use `gh api /users/<user>/settings/billing/actions` (`total_minutes_used`, `included_minutes`). If neither works, estimate from `gh run list --limit 100 --json durationMs,createdAt` (newer gh) or from workflow durations, and mark `est.`. Org-owned repos use `/orgs/<org>/settings/billing/...`.
+This is the enhanced billing API; it needs the `user` scope. `gh auth refresh -s user` is interactive (it opens a browser), so an unattended run never runs it: open a `secret` item asking the human to run it, and use the fallbacks below meanwhile. Older accounts may use `gh api /users/<user>/settings/billing/actions` (`total_minutes_used`, `included_minutes`). If neither works, estimate from `gh run list --limit 100 --json durationMs,createdAt` (newer gh) or from workflow durations, and mark `est.`. Org-owned repos use `/orgs/<org>/settings/billing/...`.
 
 Keep CI small: Linux runners only, cache dependencies, `concurrency` with `cancel-in-progress: true`, and `paths-ignore` for `burn/**` so state-file commits don't trigger builds.
 
@@ -103,7 +103,7 @@ printf %s "$STRIPE_TEST_KEY" | gh secret set STRIPE_SECRET_KEY --repo <owner>/<s
 gh secret list --repo <owner>/<slug>
 ```
 
-`gh secret set` reads the value from stdin when `--body` is omitted. PowerShell: `$env:CLOUDFLARE_API_TOKEN | gh secret set CLOUDFLARE_API_TOKEN --repo <owner>/<slug>`. Non-secret settings go in `gh variable set`.
+`gh secret set` reads the value from stdin when `--body` is omitted. On Windows, run these from Git Bash. Windows PowerShell 5.1 adds a trailing newline when it pipes a string to a program, and the newline becomes part of the secret. Non-secret settings go in `gh variable set`.
 
 ## Custom domain
 

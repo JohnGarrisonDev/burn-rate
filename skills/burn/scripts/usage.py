@@ -3,20 +3,31 @@
 
 Python 3.11+, standard library only.
 
-    python usage.py                      # current usage as JSON (auto-detects the source)
+    python usage.py                      # current usage as JSON (auto: picks the source by platform)
     python usage.py --source codex-sessions
     python usage.py plan                 # usage + this run's budget, using config.toml
     python usage.py plan --weekly 61 --resets-at 2026-10-17T13:59:59Z --five-hour 12
                                          # same, with numbers you already have
                                          # (e.g. from Claude Desktop's get_usage tool)
 
-Sources, tried in this order by "auto":
+Sources:
   codex-sessions     newest rate_limits snapshot in ~/.codex/sessions/**/*.jsonl
-  claude-statusline  ~/.burn-rate/cache/claude-usage.json, written by claude_statusline_hook.py
+  claude-statusline  <burn home>/cache/claude-usage.json, written by claude_statusline_hook.py
   declared           no live numbers; the run is time-boxed by budget.declared_minutes_per_run
 
-Claude Desktop has an exact usage tool (get_usage). Skills call it directly and pass
-the numbers to `plan`. This script can't call it.
+"auto" picks the source by platform (config.toml `platform`, or --platform):
+  codex           codex-sessions
+  claude-cli      claude-statusline
+  claude-desktop  claude-statusline, as a fallback only. Desktop has an exact usage tool
+                  (get_usage) that this script can't call: the skill calls it and passes
+                  the numbers with --weekly/--resets-at/--five-hour.
+  (no platform)   the freshest of codex-sessions and claude-statusline
+If the platform's source has nothing, auto falls back to declared. It never reads the
+other platform's numbers: a Codex reading says nothing about a Claude subscription.
+
+plan adds stop_weekly_pct (end the run here) and stop_new_work_pct (stop starting new
+work here; the gap is the handoff reserve, about 3 points, or 6 on the last run of the
+week for the recap and retro).
 
 Output is always one JSON object on stdout. Exit code 0 even when usage is unknown;
 check the "source" and "ok" fields.
@@ -31,6 +42,11 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 WEEK_MIN = 7 * 24 * 60
+PLATFORMS = ("claude-desktop", "claude-cli", "codex")
+# Points of weekly budget kept back for the handoff (commit, push, log, retro, notify).
+# The last run of the week keeps more, for the weekly recap and its retro.
+HANDOFF_RESERVE = 3.0
+LAST_RUN_RESERVE = 6.0
 
 
 def burn_home():
@@ -122,6 +138,8 @@ def read_codex():
                 rec = json.loads(line)
             except json.JSONDecodeError:
                 continue
+            if not isinstance(rec, dict):
+                continue
             rl = _find_rate_limits(rec)
             if not rl:
                 continue
@@ -153,6 +171,8 @@ def read_claude_statusline():
         data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as e:
         return empty("claude-statusline", f"unreadable cache: {e}")
+    if not isinstance(data, dict):
+        return empty("claude-statusline", "unreadable cache: not a JSON object")
     rl = data.get("rate_limits") or {}
     observed = parse_time(data.get("captured_at"))
     wk = rl.get("seven_day") or {}
@@ -182,18 +202,34 @@ def finish(source, observed, weekly, five, note):
             "five_hour": window(f_used, f_reset), "note": note}
 
 
-def read(source):
+def read(source, platform=None):
     if source == "codex-sessions":
         return read_codex()
     if source == "claude-statusline":
         return read_claude_statusline()
     if source == "declared":
         return empty("declared", "no live usage; time-box the run")
-    # auto: freshest successful reading wins
+    # auto: the platform decides the source.
+    if platform == "codex":
+        return _or_declared(read_codex())
+    if platform == "claude-cli":
+        return _or_declared(read_claude_statusline())
+    if platform == "claude-desktop":
+        r = _or_declared(read_claude_statusline())
+        r["note"] += ("; on Claude Desktop call get_usage and pass its numbers with "
+                      "--weekly/--resets-at/--five-hour instead")
+        return r
+    # No platform known: the freshest successful reading wins.
     results = [r for r in (read_codex(), read_claude_statusline()) if r["ok"]]
     if not results:
         return empty("declared", "no live usage source found; time-box the run")
     return min(results, key=lambda r: r["age_minutes"] if r["age_minutes"] is not None else 1e9)
+
+
+def _or_declared(r):
+    if r["ok"]:
+        return r
+    return empty("declared", f"{r['source']}: {r['note']}; time-box the run")
 
 
 # ---------- planning ----------
@@ -211,6 +247,7 @@ def plan(usage, cfg, now=None):
     b = cfg.get("budget", {})
     target = float(b.get("target_end_pct", 95))
     hard = float(b.get("hard_stop_pct", 97))
+    ceiling = min(target, hard)
     five_stop = float(b.get("five_hour_stop_pct", 90))
     minutes = int(b.get("declared_minutes_per_run", 90))
     hours = sorted(cfg.get("schedule", {}).get("hours_before_reset", [36, 20, 6]), reverse=True)
@@ -218,12 +255,25 @@ def plan(usage, cfg, now=None):
     out = {"usage": usage, "now": iso(now)}
     used = usage["weekly"]["used_pct"]
     reset = parse_time(usage["weekly"]["resets_at"])
+    five_used = usage["five_hour"]["used_pct"] or 0.0
 
     if used is None or reset is None:
-        out.update(mode="time-boxed", go=True, minutes=minutes, stop_weekly_pct=None,
+        go, stop_at, new_work = True, None, None
+        reason = f"no live weekly usage; work for {minutes} minutes, then wrap up"
+        if used is not None:
+            # Used is known but the reset isn't: no fair share, but the ceiling still holds.
+            stop_at = round(ceiling, 1)
+            new_work = round(max(used, ceiling - HANDOFF_RESERVE), 1)
+            reason = (f"weekly reset unknown; work for {minutes} minutes or until weekly "
+                      f"reaches {new_work}%, then wrap up")
+            if used >= ceiling:
+                go, reason = False, f"weekly usage {used}% is already at or past the target ({ceiling}%)"
+            elif five_used >= five_stop:
+                go, reason = False, f"5-hour window at {five_used}%; wait for it to reset"
+        out.update(mode="time-boxed", go=go, minutes=minutes, stop_weekly_pct=stop_at,
+                   stop_new_work_pct=new_work, handoff_reserve_pts=HANDOFF_RESERVE,
                    five_hour_stop_pct=five_stop, runs_left_including_this=None,
-                   is_last_run_of_week=None,
-                   reason=f"no live weekly usage; work for {minutes} minutes, then wrap up")
+                   is_last_run_of_week=None, reason=reason)
         return out
 
     hours_left = (reset - now).total_seconds() / 3600
@@ -231,24 +281,27 @@ def plan(usage, cfg, now=None):
     # we're within its slot (later than its start). Unscheduled/manual runs count as one.
     later_slots = [h for h in hours if h < hours_left - 0.5]
     runs_left = len(later_slots) + 1
+    last = runs_left == 1
     room = max(0.0, target - used)
     allowance = room / runs_left
-    stop_at = min(target, hard, used + allowance)
-    five_used = usage["five_hour"]["used_pct"] or 0.0
+    stop_at = min(ceiling, used + allowance)
+    reserve = LAST_RUN_RESERVE if last else HANDOFF_RESERVE
+    new_work = max(used, stop_at - reserve)
 
     go = True
     reason = f"{room:.0f} points left to burn over {runs_left} run(s); this run may spend about {allowance:.0f}"
-    if used >= hard or used >= target:
-        go, reason = False, f"weekly usage {used}% is already at or past the target ({target}%)"
+    if used >= ceiling:
+        go, reason = False, f"weekly usage {used}% is already at or past the target ({ceiling}%)"
     elif allowance < 2:
         go, reason = False, f"only {allowance:.1f} points available for this run; not worth starting"
     elif five_used >= five_stop:
         go, reason = False, f"5-hour window at {five_used}%; wait for it to reset"
 
     out.update(mode="metered", go=go, stop_weekly_pct=round(stop_at, 1),
+               stop_new_work_pct=round(new_work, 1), handoff_reserve_pts=reserve,
                five_hour_stop_pct=five_stop, runs_left_including_this=runs_left,
                hours_until_reset=round(hours_left, 1),
-               is_last_run_of_week=runs_left == 1, reason=reason)
+               is_last_run_of_week=last, reason=reason)
     return out
 
 
@@ -260,6 +313,8 @@ def main(argv=None):
     ap.add_argument("--weekly", type=float, help="weekly used %% you already know")
     ap.add_argument("--resets-at", help="weekly reset time you already know (ISO or epoch)")
     ap.add_argument("--five-hour", type=float, help="5-hour used %% you already know")
+    ap.add_argument("--platform", choices=PLATFORMS,
+                    help="platform for --source auto (default: platform in config.toml)")
     args = ap.parse_args(argv)
 
     cfg = load_config()
@@ -269,9 +324,11 @@ def main(argv=None):
                        (args.five_hour, None), "numbers passed on the command line")
     else:
         source = args.source or cfg.get("budget", {}).get("usage_source", "auto")
+        platform = args.platform or cfg.get("platform")
         if source == "claude-desktop":
-            source = "auto"  # the script can't call the Desktop tool; fall back
-        usage = read(source)
+            # The script can't call the Desktop tool; auto falls back to the statusline cache.
+            source, platform = "auto", "claude-desktop"
+        usage = read(source, platform if platform in PLATFORMS else None)
 
     result = usage if args.command == "read" else plan(usage, cfg)
     json.dump(result, sys.stdout, indent=2)

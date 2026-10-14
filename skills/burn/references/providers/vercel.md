@@ -83,7 +83,7 @@ printf %s "$STRIPE_SECRET_KEY" | npx vercel env add STRIPE_SECRET_KEY production
 npx vercel env ls
 ```
 
-PowerShell: `$env:STRIPE_SECRET_KEY | npx vercel env add STRIPE_SECRET_KEY preview`. Use test keys for preview. `npx vercel env pull .env.local` writes secrets to disk: only into a gitignored file, and delete it at the end of the run.
+On Windows, run these from Git Bash. Windows PowerShell 5.1 adds a trailing newline when it pipes a string to a program, and the newline becomes part of the secret. Use test keys for preview. `npx vercel env pull .env.local` writes secrets to disk: only into a gitignored file, and delete it at the end of the run.
 
 ## Custom domain
 
@@ -106,7 +106,7 @@ npx vercel project rm <slug>                  # whole project and its deployment
 npx vercel domains rm example.com             # detaches; doesn't cancel registration
 ```
 
-Prune old previews now and then (`npx vercel ls`, then `remove`), which needs no approval as long as production isn't touched.
+Preview deployments that runs created are the exception: prune old ones now and then (`npx vercel ls`, then `npx vercel remove <preview-url> --yes`) without an approval, as long as production isn't touched. Record what you pruned in INFRA.md under **Removed** (see "Teardown" in the burn-infra skill).
 
 ## IaC
 

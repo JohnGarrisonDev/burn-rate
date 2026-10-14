@@ -7,7 +7,7 @@ description: Show or change Burn Rate settings (budget target and stops, schedul
 
 Settings live in `config.toml` in the burn home (`$BURN_RATE_HOME`, else `~/.burn-rate`). Every key is documented in [../burn/templates/config.toml](../burn/templates/config.toml). This skill shows them in plain words and changes them safely.
 
-Paths here are relative to this skill's folder. Read [../burn/references/guardrails.md](../burn/references/guardrails.md) first.
+Paths here are relative to this skill's folder. Resolve the burn skill's folder (`../burn/`) to an absolute path first and run scripts as `python <abs path to burn skill>/scripts/...`; the examples keep the short form. Read [../burn/references/guardrails.md](../burn/references/guardrails.md) first.
 
 ## Who is asking
 
@@ -43,11 +43,11 @@ If the user asks about one area ("what's my schedule?"), show just that. Run `py
 1. Work out which keys the user means. "Burn less" usually means `budget.target_end_pct`; "stop earlier" may mean `hard_stop_pct` or fewer runs. If it's ambiguous, ask with the two or three likely readings.
 2. Check the new value against the table below. Out of range: say why and suggest the nearest valid value.
 3. Show the change as `key: old → new` with one line on what it does in practice. For anything in the "needs an OK" column, wait for a yes.
-4. Back up: copy `config.toml` to `config.toml.bak`.
+4. Back up: copy `config.toml` to `config.toml.bak-<YYYY-MM-DD-HHMM>` (UTC) in the burn home.
 5. Edit the text in place. Change only the value; keep the comments and the layout.
 6. Validate against the backup:
    ```
-   python ../burn/scripts/config_check.py --previous <burn home>/config.toml.bak
+   python ../burn/scripts/config_check.py --previous <burn home>/config.toml.bak-<stamp>
    ```
    With no path, the script checks `<burn home>/config.toml`.
    Add `--allow-gated` only when the user asked for a gated change in this conversation (see "Gated changes"). Exit code 1 means errors: restore the backup, explain, and stop.
@@ -127,7 +127,7 @@ Changing `platform` also means:
 
 ## Self-improvement
 
-- `suggest`: proposed edits go into `SKILL_FEEDBACK.md`. Nothing is changed. The default.
+- `suggest`: proposed edits go into `burn/SKILL_PROPOSALS.md` in the project repo. Nothing is changed. The default.
 - `local`: `burn-improve` edits the installed skills. Tell the user that re-running `install.sh` or `install.ps1` overwrites those edits, and that if they installed with `--link`, edits land in their clone of the repo.
 - `maintainer`: needs `self_improve.skills_repo_path` to be a git clone of the burn-rate repo with `gh` logged in and push access. Check it: the folder has `.git`, `skills/burn/SKILL.md` and `tests/lint_skills.py`, and `git -C <path> remote get-url origin` points at a burn-rate repo. If there's no clone, offer `gh repo clone <owner>/burn-rate <path>`. `config_check.py` rejects maintainer mode without a valid clone.
 - `upstream_issues = true`: explain that `burn-improve` will file issues on `upstream_repo` with a sanitized description: no product names, URLs, secrets or paths. Get a yes.

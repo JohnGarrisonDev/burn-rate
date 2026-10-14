@@ -71,9 +71,9 @@ Send a notification ([notify.md](notify.md)) with `--priority high` if work is b
 
 When the item has `ANSWER: APPROVED` (or a specific option), or the human approves it directly in an interactive session (the `burn-configure` skill handles that case the same way):
 
-1. If the approved option costs money, set `providers.<name>.monthly_cap_usd` in `config.toml` to the cap in the option. Edit the text, keep the comments. If the human wrote a different number, use theirs.
+1. If the approved option costs money, set `providers.<name>.monthly_cap_usd` in `config.toml` to the cap in the option, following "Editing config.toml unattended" in [human-inbox.md](human-inbox.md) (back up, edit, `config_check.py --previous <backup> --allow-gated`, restore and open a `blocker` item on failure). If the human wrote a different number, use theirs.
 2. Add a DECISIONS entry: `## D-0019 · 2026-10-18 · Supabase Pro at $25/month cap (NH-012)` with the usage that triggered it, the options, the chosen one, and the cap.
-3. Upgrading a plan or adding a payment method is still a human action ([guardrails.md](guardrails.md) section 4). If the upgrade needs a card or a dashboard click, open (or keep open) an `account` item with exact steps: which page, which plan, which org. You may only change paid settings yourself if the CLI allows it with the payment method already on file, the change matches the approved option exactly, and it stays inside the cap.
+3. Upgrading a plan or adding a payment method is still a human action ([guardrails.md](guardrails.md) section 4). Open (or keep open) an `account` item with exact steps: which page, which plan, which org. The human makes the change; you never upgrade a plan yourself ([guardrails.md](guardrails.md) section 2).
 4. Update `burn/INFRA.md`: new tier and `$/month` for the affected resources.
 5. Resolve the item with what you did.
 

@@ -111,7 +111,7 @@ npx wrangler deploy --env staging     # or a separate staging Worker defined in 
 npx wrangler deploy                   # production
 ```
 
-Production only when `launch_approved = true` (or for a workers.dev URL that isn't announced yet, if the project's DECISIONS say so). Note the preview URL in LOG.md and `urls.preview` in `burn/project.toml`.
+Production only when `launch_approved = true`. Note the preview URL in LOG.md and `urls.preview` in `burn/project.toml`.
 
 ## Secrets
 
@@ -121,7 +121,7 @@ printf %s "$STRIPE_SECRET_KEY" | npx wrangler pages secret put STRIPE_SECRET_KEY
 npx wrangler secret list
 ```
 
-PowerShell: `$env:STRIPE_SECRET_KEY | npx wrangler secret put STRIPE_SECRET_KEY`. The value comes from an env var the human set. Never type it literally. Non-secret config goes in `[vars]` in `wrangler.toml`. Local dev secrets go in `.dev.vars`, which must be in `.gitignore`.
+On Windows, run these from Git Bash. Windows PowerShell 5.1 adds a trailing newline when it pipes a string to a program, and the newline becomes part of the secret. The value comes from an env var the human set. Never type it literally. Non-secret config goes in `[vars]` in `wrangler.toml`. Local dev secrets go in `.dev.vars`, which must be in `.gitignore`.
 
 ## Custom domain
 

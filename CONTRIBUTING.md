@@ -14,10 +14,11 @@ Thanks for wanting to help. A few things that make reviews quick.
 
 ```bash
 python tests/lint_skills.py
+python tests/lint_style.py
 python -m unittest discover tests
 ```
 
-Both have to pass. The linter checks frontmatter and that every relative link resolves.
+All three have to pass. `lint_skills.py` checks frontmatter and that every relative link resolves. `lint_style.py` checks the public docs against the banned-word list and the other rules in the style guide.
 
 ## What makes a good change
 

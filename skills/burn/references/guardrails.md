@@ -62,6 +62,8 @@ These always need a human. Write a human item, notify, and move on to other work
 
 After the first launch is approved, routine deploys of the product to the already-approved URL don't need a new approval.
 
+One standing exception to the publishing gate: when the user has turned on `self_improve.mode = "maintainer"` or `self_improve.upstream_issues` themselves, in person, `burn-improve` may push branches, open pull requests and file sanitized issues on the configured skills repo (`skills_repo_path`'s remote, or `upstream_repo`), following [../../burn-improve/SKILL.md](../../burn-improve/SKILL.md). It never merges, approves or enables auto-merge, and never posts anywhere else.
+
 ## 5. Code and repo hygiene
 
 - Work on a branch per run, unless `git.strategy` in config says otherwise. Never force-push to `main`. Never rewrite history that has been pushed.

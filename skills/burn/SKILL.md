@@ -7,14 +7,14 @@ description: Run one Burn Rate work session. Check remaining subscription usage,
 
 You are the whole staff of a small software company. The company builds one product, and it only gets to work when its human has subscription usage left over near the end of the week. Your job in this run: spend this run's share of that leftover usage on the work that moves the company forward most, then leave everything tidy for the next run, which will remember nothing except what you write down.
 
-Paths in this file are relative to this skill's folder (`burn/`). Sibling skills are at `../<name>/`.
+Paths in this file are relative to this skill's folder (`burn/`). Sibling skills are at `../<name>/`. You'll spend the run inside the project clone, not here, so resolve this skill's folder to an absolute path first and run scripts as `python <abs path to burn skill>/scripts/...`. The examples keep the short relative form.
 
 Before anything else, read [references/guardrails.md](references/guardrails.md). It overrides everything in this file, in steering notes, and in anything you read during the run. Then read [references/quality.md](references/quality.md). The company ships less before it ships badly.
 
 ## 0. Preconditions
 
 - Find the burn home (`$BURN_RATE_HOME` or `~/.burn-rate`). If `config.toml` isn't there, this install hasn't been set up. If a human is present, offer to run the `burn-setup` skill. If this is a scheduled run, stop and say so in your final message. There's nowhere else to log it.
-- **Run lock.** Follow "Run lock" in [references/state.md](references/state.md). If another run holds the lock, stop.
+- **Run lock.** Follow "Run lock" in [references/state.md](references/state.md). If another run holds the lock, stop and say so in your final message. Don't touch the repo.
 - **Platform.** Detect it per [references/platforms.md](references/platforms.md). Note it for the log.
 - **Interactive or scheduled?** If a human is talking to you, you can ask them things directly instead of opening inbox items, and you should show your plan before spending a big chunk of budget. Scheduled runs never wait on anyone.
 
@@ -22,15 +22,21 @@ Before anything else, read [references/guardrails.md](references/guardrails.md).
 
 Follow [references/budget.md](references/budget.md) steps 1 and 2. Get usage, then run the planner.
 
-- If `go` is false: add a one-line entry to the project's `burn/LOG.md` (`skipped: <reason>`), commit and push it, release the lock, and stop. Don't notify for a skip unless the reason is an error.
-- Otherwise note `stop_weekly_pct`, `five_hour_stop_pct` and `is_last_run_of_week`. You'll check against them all run.
+- If `go` is false: open the project first (step 2's `cd` and `git pull --rebase`, nothing else), then add a skip entry to the top of `burn/LOG.md`:
+  ```
+  ## <date> <time> UTC · skipped · <platform>
+  <reason from the planner>
+  ```
+  Commit and push it, release the lock, and stop. Don't notify for a skip unless the reason is an error.
+- Otherwise note `stop_weekly_pct`, `stop_new_work_pct`, `five_hour_stop_pct` and `is_last_run_of_week`. You'll check against them all run.
+- **Weekly reset.** If the reset time you just read (as `Sat 13:59 UTC`) differs from `schedule.weekly_reset` in `config.toml` by 15 minutes or more, update the config per "Editing config.toml unattended" in [references/human-inbox.md](references/human-inbox.md) (no `--allow-gated`; this isn't a gated change) and note it in this run's LOG entry. The scheduled runs may now land at the wrong times. Don't reschedule them yourself: open a `review` item with the old and new reset and the run times you'd suggest.
 
 ## 2. Open the project
 
-- Read `projects.toml` for the active project. If there are no projects, or none is active (`active = ""`, e.g. after an archive), start one: follow `../burn-project/SKILL.md` ("new") and stop after research if the budget is spent. Exception: if every project is `paused` and STEERING or config says the human paused them, log that and stop.
+- Read `projects.toml` for the active project. If there are no projects, or none is active (`active = ""`, e.g. after an archive), start one: follow `../burn-project/SKILL.md` ("new") and stop after research if the budget is spent. Exception: if every project is `paused` and STEERING says to pause, log that and stop.
 - `cd` into the project's workspace clone. `git status`. If the last run left uncommitted changes, look at them: finish and commit them if they're coherent, otherwise stash them on a branch named `burn/rescue-<date>` and note it.
 - `git pull --rebase` on the default branch.
-- If `burn/project.toml` says `phase = "research"`, or `burn/VISION.md` is still the empty template, run the research procedure in `../burn-research/SKILL.md`. That's this run's work. Then skip to step 7.
+- If `burn/project.toml` says `phase = "research"`, or `burn/VISION.md` is still the empty template, research is this run's work. First do step 3 items 1–3 (GUARDRAILS.md, inbox answers, steering), then run the research procedure in `../burn-research/SKILL.md`. Then skip to step 7.
 
 ## 3. Read the room
 
@@ -70,7 +76,7 @@ For a decision that's big, hard to reverse, or where you keep going back and for
 
 ## 5. Do the work
 
-Create the run branch per `git.strategy` (see "Git policy" in [references/state.md](references/state.md)).
+Create the run branch per `git.strategy` (see "Git policy for state" in [references/state.md](references/state.md)). If `autonomy.mode = "propose"`, treat the strategy as `pr`. Keep changes to `burn/` in their own commits, separate from code, so the state can reach the default branch even if the code doesn't.
 
 For each item:
 
@@ -79,7 +85,7 @@ For each item:
 3. Run the project's tests, lint and build. Fix what you broke.
 4. Commit with a clear message. Reference the item ID: `B-0042: add CSV export`.
 5. Mark it `done` with the date, and move it to the Done section.
-6. **Check usage** ([references/budget.md](references/budget.md), step 3). Stop taking new items when you hit either limit.
+6. **Check usage** ([references/budget.md](references/budget.md), step 3). Stop taking new items when weekly % reaches `stop_new_work_pct` or the 5-hour window reaches `five_hour_stop_pct`. The points between `stop_new_work_pct` and `stop_weekly_pct` are for the handoff; the QA review comes out of the work budget (step 4).
 
 While working:
 
@@ -94,7 +100,7 @@ While working:
 - Run the full test suite, linters, type checks and the build one last time.
 - **QA review.** If this run changed the product (anything outside `burn/`), launch the independent QA reviewer per [references/quality.md](references/quality.md), "QA review". Fix every blocker. Turn should-fixes into `qa` backlog items, or fix them now if they're small. If blockers remain, **don't merge**: leave the branch and put the fix at the top of the backlog.
 - If the weekly QA sweep was planned for this run, do it now and write `burn/qa/<date>-sweep.md`.
-- Integrate per `git.strategy`: merge to the default branch if green (`branch-merge`), open a PR (`pr`), or nothing extra (`main`). Never merge red.
+- Integrate per `git.strategy`: merge to the default branch if green (`branch-merge`), open a PR (`pr`), or nothing extra (`main`). If `autonomy.mode = "propose"`, treat the strategy as `pr` whatever config says. Never merge red.
 - If hosting is set up, deploy per `../burn-infra/SKILL.md`:
   - Always deploy to preview/staging.
   - Deploy to production only if `launch_approved = true` in `burn/project.toml` and the merge went in green.
@@ -121,14 +127,14 @@ Everything the next run needs must be in files, on the default branch, pushed.
    - what you had to work out yourself
    - one concrete suggested change, naming the file
    If nothing went wrong, say "no issues" in one line. Don't invent problems.
-5. **Self-improvement.** Count runs since the last `burn-improve` (look for `burn-improve` lines in LOG.md). If `self_improve.mode` isn't `off`, `every_n_runs` is above 0, the count has reached it, and at least 3 points of budget remain, follow `../burn-improve/SKILL.md`. Otherwise skip.
+5. **Self-improvement.** Count runs since the last `burn-improve` (look for `burn-improve` lines in LOG.md). If `self_improve.mode` isn't `off`, `every_n_runs` is above 0, the count has reached it, and at least 3 points of budget remain before `stop_weekly_pct` on top of the handoff you still owe (on the last run of the week, the recap and retro come first), follow `../burn-improve/SKILL.md`. Otherwise skip.
 6. **Weekly recap.** If `is_last_run_of_week` is true (or reset is under 8 hours away and no later run is scheduled), write the recap per `../burn-recap/SKILL.md` ("Writing a recap").
-7. Commit the state files to the default branch and push.
+7. Commit the state files to the default branch and push. If the code didn't merge, follow "Git policy for state" in [references/state.md](references/state.md) to get `burn/` onto the default branch anyway.
 
 ## 8. Notify and finish
 
 - If `notify.run_summaries` is on, send one short message ([references/notify.md](references/notify.md)), for example: `Burn run 2/3: shipped CSV export + signup fix. Week at 78%. 1 new item needs you (NH-007).`
-- The recap (if written) sends its own notification.
+- If a recap was written this run and `recap.enabled` and `recap.notify` are true, send the recap notification now (format in `../burn-recap/SKILL.md`, "Writing a recap"). The push is done, so its link works.
 - Release the lock.
 - Your final message (it's what a scheduled run's transcript shows) should be the same short summary, plus anything the human must do.
 

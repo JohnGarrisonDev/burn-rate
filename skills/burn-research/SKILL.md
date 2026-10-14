@@ -11,7 +11,8 @@ Also read [../burn/references/guardrails.md](../burn/references/guardrails.md) f
 
 ## 1. Where am I being called from?
 
-- **From a burn run** (`phase = "research"`, or after `burn-project new`): the run already holds the lock and has a budget plan. Use its `stop_weekly_pct` and `five_hour_stop_pct`.
+- **From a burn run** (`phase = "research"`, or after `burn-project new`): the run already holds the lock and has a budget plan. Use its `stop_new_work_pct`, `stop_weekly_pct` and `five_hour_stop_pct`.
+- **From burn-setup** (the user chose to start research during setup): setup already holds the lock and has a budget plan from its step 5. Use the same three numbers. Setup writes the LOG entry and releases the lock.
 - **On its own** (the user asked): find the burn home and the active project per [../burn/references/state.md](../burn/references/state.md), take the run lock, `cd` into the project's workspace clone, `git pull --rebase`, and get a budget plan per [../burn/references/budget.md](../burn/references/budget.md) steps 1 and 2. If `go` is false and a human is present, tell them the numbers and ask whether to go ahead with a smaller step (a market check fits; idea research usually doesn't). Release the lock when you finish.
 
 ## 2. Which kind?
@@ -38,7 +39,7 @@ Follow the stages in research.md. After each stage:
 2. Commit and push: `research: stage 2 evidence for C01, C04`.
 3. Check usage ([../burn/references/budget.md](../burn/references/budget.md), step 3).
 
-Stop starting new work when you hit `stop_weekly_pct` or `five_hour_stop_pct`. Partial stages are fine as long as the `Status:` line says exactly where you are. Then hand off normally: a LOG entry that says `Research: stage <n> of 5, resumes next run`, the retro, the push. The next burn run sees `phase = "research"` and comes back here.
+Stop starting new work when you hit `stop_new_work_pct` or `five_hour_stop_pct`. Partial stages are fine as long as the `Status:` line says exactly where you are. Then hand off normally: a LOG entry that says `Research: stage <n> of 5, resumes next run`, the retro, the push. The next burn run sees `phase = "research"` and comes back here.
 
 Rough cost per stage, to plan with: signals 3–5 points, evidence 3–6, scoring 1–2, meeting 3–6, writing it up 2–3. If less than about 5 points remain, don't start the meeting; finish scoring and stop.
 

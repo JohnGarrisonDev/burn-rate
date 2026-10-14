@@ -80,7 +80,7 @@ npx neonctl branches create --name preview/<run> --parent main --output json
 npx neonctl connection-string preview/<run> --pooled | <host secret command for the preview env>
 ```
 
-Run migrations against the preview branch first, then against production. Production migrations only when `launch_approved = true`, or before launch when there are no real users. Delete preview branches when the run is done:
+Run migrations against the preview branch first, then against production. Production migrations only when `launch_approved = true`, or before launch when there are no real users. Delete preview branches when the run is done. A preview branch a run created needs no approval to delete; record it in INFRA.md under **Removed**. Never delete `main` or any branch a run didn't create:
 
 ```
 npx neonctl branches delete preview/<run>
@@ -95,7 +95,7 @@ npx neonctl connection-string main --pooled | npx wrangler secret put DATABASE_U
 npx neonctl connection-string main --pooled | npx vercel env add DATABASE_URL production
 ```
 
-Use `--pooled` for serverless runtimes. For local dev, write it into a gitignored `.env` and delete it at the end of the run.
+Use `--pooled` for serverless runtimes. On Windows, run these from Git Bash. Windows PowerShell 5.1 adds a trailing newline when it pipes a string to a program, and the newline becomes part of the secret. For local dev, write it into a gitignored `.env` and delete it at the end of the run.
 
 ## Custom domain
 

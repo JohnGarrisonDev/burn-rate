@@ -72,7 +72,7 @@ Keep it to roughly one screen. Cut before you add.
 
 This is the "Weekly retro" standing meeting from [meetings.md](../burn/references/meetings.md).
 
-- If `meetings.enabled` is on and at least 6 points of budget remain before `stop_weekly_pct`, run it as a short meeting per "Weekly retro" in meetings.md: product, eng and ops, one round. Save the minutes to `burn/meetings/<date>-weekly-retro.md` and link them from the recap.
+- If `meetings.enabled` is on and weekly % is still at least 3 points below `stop_weekly_pct`, run it as a short meeting per "Weekly retro" in meetings.md: product, eng and ops, one round. (The last run of the week stops new work at `stop_new_work_pct`, about 6 points below `stop_weekly_pct`, so normally the room is there; see [budget.md](../burn/references/budget.md).) Save the minutes to `burn/meetings/<date>-weekly-retro.md` and link them from the recap.
 - Otherwise write the retro yourself from the week's LOG entries and SKILL_FEEDBACK entries. Say "(written by the chair, no meeting)" at the end of the section.
 
 Either way, the retro is three short parts: went well, went badly, one change. The change becomes a backlog item or a STEERING-style note to the next run in the LOG entry. Problems with the skills themselves go to SKILL_FEEDBACK.md, not the recap.
@@ -83,7 +83,7 @@ Either way, the retro is three short parts: went well, went badly, one change. T
 2. If budget allows, run the weekly retro meeting. If not, write it yourself.
 3. Write `burn/recaps/<date>.md`. If a file for that week already exists (a re-run, or a manual run after the last scheduled one), update it in place rather than writing a second.
 4. Leave committing to `burn`: it commits all state files in its step 7.
-5. If `recap.enabled` and `recap.notify` are both true, send one notification per [notify.md](../burn/references/notify.md), after `burn` has pushed (so the link works). Title `Weekly recap`, message in one line, nothing secret:
+5. Don't send the notification yourself. `burn` sends it in its step 8, after it has pushed, so the link works. It sends one, per [notify.md](../burn/references/notify.md), only if `recap.enabled` and `recap.notify` are both true. Title `Weekly recap`, message in one line, nothing secret:
    `3 runs, shipped CSV export + signup. Week ended at 94%. NH-004 (high) still needs you.`
    Include the GitHub link to the file if there is a remote.
 
@@ -104,7 +104,7 @@ A week can end without a recap: the last run crashed, ran out of budget before s
 1. Gather the material exactly as above. Use LOG.md, DECISIONS.md, `burn/meetings/`, NEEDS_HUMAN.md, and the git log between the two resets. Git history is the ground truth when LOG.md is missing entries.
 2. Don't run a retro meeting. Write the retro yourself and mark it "(rebuilt after the week ended)".
 3. Add one line under the headline: `Rebuilt on <today> from the log and git history; the last run didn't write a recap.` If you can tell why (a LOG entry that ends mid-run, a skip for budget), say why.
-4. Write the file, commit it to the default branch as `recap: week ending <date> (rebuilt)`, and push. If a run is in progress (the burn home `.lock` exists and is under 6 hours old), write the file but don't commit; the running burn will pick it up.
+4. If a run is in progress (the burn home `.lock` exists and is under 6 hours old), don't write anything. Show the recap in chat instead, and say the file gets written later: by the run itself if this is the week it's finishing, otherwise by running `burn-recap` again once the run is done. Otherwise write the file, commit it to the default branch as `recap: week ending <date> (rebuilt)`, and push.
 5. Notify per the rules above only if this is the latest week and the user isn't the one who asked. If they asked, they're already reading it.
 
 ## Don'ts

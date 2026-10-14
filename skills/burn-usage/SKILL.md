@@ -9,11 +9,13 @@ Answer "how much do I have left, and what will Burn Rate do with it?" in a few l
 
 ## Steps
 
+Script paths below are relative to this skill's folder. Resolve the burn skill's folder (`../burn/`) to an absolute path first and run `python <abs path to burn skill>/scripts/usage.py ...`.
+
 1. **Read usage** using the first source that works, per [../burn/references/budget.md](../burn/references/budget.md) step 1:
    - Claude Desktop: the `get_usage` tool.
    - Codex: `python ../burn/scripts/usage.py --source codex-sessions`
    - Claude Code CLI: `python ../burn/scripts/usage.py --source claude-statusline`
-2. **Plan preview.** Run `python ../burn/scripts/usage.py plan` with the numbers (`--weekly`, `--resets-at`, `--five-hour` if you got them from a tool). This uses `config.toml`.
+2. **Plan preview.** Run `python ../burn/scripts/usage.py plan` with the numbers (`--weekly`, `--resets-at`, `--five-hour` if you got them from a tool; on Claude Desktop always pass the `get_usage` numbers this way). This uses `config.toml`. Show both stops: new work ends at `stop_new_work_pct`, the run ends by `stop_weekly_pct`.
 3. **Schedule.** From `config.toml` `[schedule]`, list the run times still ahead this week in the user's timezone. On Claude Desktop, cross-check with `mcp__scheduled-tasks__list_scheduled_tasks` (tasks named `burn-rate-run-*`) and show the real next run time.
 4. **History.** From the active project's `burn/LOG.md`, pull weekly % at start and end for each run in the current and previous usage week.
 

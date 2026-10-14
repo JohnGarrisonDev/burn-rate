@@ -29,8 +29,9 @@ declared_minutes_per_run = 90
 # Runs are placed relative to the weekly reset, so they always land in the last stretch of the week.
 # Each entry is "hours before reset". These are three runs: 36h, 20h and 6h before reset.
 hours_before_reset = [36, 20, 6]
-# Your IANA timezone, for showing times to you. Scheduling itself is relative to the reset.
-timezone = "America/New_York"
+# Your IANA timezone (e.g. "America/New_York"), for showing times to you. burn-setup fills it in.
+# Empty means show times in UTC. Scheduling itself is relative to the reset.
+timezone = ""
 # Set by burn-setup from the platform's usage data, e.g. "Sat 13:59 UTC". Refreshed every run.
 weekly_reset = ""
 
@@ -78,7 +79,7 @@ pushover_token_from = ""
 
 [self_improve]
 # off | suggest | local | maintainer
-#   suggest:    retros are written to SKILL_FEEDBACK.md, and proposed edits are written there too
+#   suggest:    retros are written to SKILL_FEEDBACK.md, and proposed edits to SKILL_PROPOSALS.md
 #   local:      burn-improve edits your installed copy of the skills
 #   maintainer: burn-improve edits a clone of the burn-rate repo and opens a PR (never merges)
 mode = "suggest"

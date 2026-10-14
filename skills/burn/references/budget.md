@@ -19,30 +19,34 @@ Use the first source that works:
 3. **Claude Code CLI.** Run `python scripts/usage.py --source claude-statusline`. This needs the statusline hook that burn-setup offers to install. If the snapshot is more than an hour old, treat it as a lower bound.
 4. **Nothing works.** Time-box the run with `budget.declared_minutes_per_run`. Watch for rate-limit errors; if one happens, go straight to the handoff.
 
-`scripts/` here means this skill's folder (`burn/scripts/`). From another skill it's `../burn/scripts/`.
+`scripts/` here means this skill's folder (`burn/scripts/`). From another skill it's `../burn/scripts/`. Your working directory is usually the project clone, so resolve the burn skill's folder to an absolute path first and run `python <abs path to burn skill>/scripts/usage.py ...`. The examples keep the short form.
+
+With no `--source`, `usage.py` picks the source by platform (`platform` in config, or `--platform`): `codex` reads Codex sessions, `claude-cli` reads the statusline cache, and `claude-desktop` reads the statusline cache only as a fallback. It never uses one platform's numbers for another's subscription.
 
 ## Step 2: plan this run
 
-Pass the numbers to the planner. It reads `config.toml` for target, hard stop and slots:
+Pass the numbers to the planner. It reads `config.toml` for target, hard stop and slots. On Claude Desktop, always pass the `get_usage` numbers this way:
 
 ```
 python scripts/usage.py plan --weekly 61 --resets-at 2026-10-17T13:59:59Z --five-hour 12
 ```
 
-or, on Codex and the Claude CLI, just `python scripts/usage.py plan` and it reads the source itself.
+On Codex and the Claude CLI, just run `python scripts/usage.py plan` and it reads the source itself. If you know weekly % but not the reset, pass `--weekly` alone: the run is time-boxed, but the target and hard stop still apply.
 
 It returns JSON. The fields that matter:
 
 | Field | Meaning |
 |---|---|
 | `go` | `false` means don't start. Log the `reason` and stop. |
-| `stop_weekly_pct` | End the run when weekly % reaches this. |
+| `stop_new_work_pct` | Stop starting new work when weekly % reaches this. |
+| `stop_weekly_pct` | The run's ceiling. Everything, handoff included, should be done by here. |
+| `handoff_reserve_pts` | The gap between the two: about 3 points, or 6 on the last run of the week (recap and retro). |
 | `five_hour_stop_pct` | End the run when the 5-hour window reaches this. |
 | `runs_left_including_this` | Remaining runs this week. |
 | `is_last_run_of_week` | `true` means write the weekly recap at the end. |
-| `mode` | `metered` (live numbers) or `time-boxed` (use `minutes`). |
+| `mode` | `metered` (live numbers) or `time-boxed` (use `minutes`). Time-boxed with a known weekly % still sets both stops. |
 
-The math is simple on purpose. The room left (target minus used) is shared evenly across the remaining runs. The last run gets whatever is left. A manual run outside the schedule counts as one more run, so it takes a fair share and doesn't eat the whole week.
+The math is simple on purpose. The room left (target minus used) is shared evenly across the remaining runs. The last run gets whatever is left. A manual run outside the schedule counts as one more run, so it takes a fair share and doesn't eat the whole week. `stop_new_work_pct` is `stop_weekly_pct` minus the handoff reserve, never below the weekly % you started at.
 
 If the script can't run (no Python), do the same math by hand and say so in the log.
 
@@ -56,21 +60,21 @@ Check usage again:
 
 Stop picking up new work when either is true:
 
-- weekly % ≥ `stop_weekly_pct`
+- weekly % ≥ `stop_new_work_pct`
 - 5-hour % ≥ `five_hour_stop_pct`
 
-When you stop, always finish properly: commit, push, write the log, the retro and the notifications. Save about 3 percentage points of weekly budget for that. If a task is only half done, either finish it in a few minutes or put it back in the backlog with notes on where you got to.
+When you stop, always finish properly: commit, push, the log, the retro and the notifications. That's what the reserve between `stop_new_work_pct` and `stop_weekly_pct` is for (about 3 points; about 6 on the last run of the week, which also writes the recap and may hold the retro meeting). The QA review is not part of the reserve: plan room for it before `stop_new_work_pct`. If a task is only half done, either finish it in a few minutes or put it back in the backlog with notes on where you got to. Don't start anything new past `stop_weekly_pct`; if the handoff runs over, keep it short.
 
 ## Rough costs
 
-These are guesses to help with planning. Replace them with real numbers as you see them in your own logs, and put the measured numbers in the log.
+These are guesses to help with planning. Replace them with real numbers as you see them in your own logs, and put the measured numbers in the log (for a meeting: weekly % before and after, in the LOG entry).
 
 | Work | Roughly |
 |---|---|
 | Orient + plan, no meeting | 1–2 points of weekly on a Max plan |
 | Small (S) backlog item | 1–2 points |
 | Medium (M) item | 3–5 points |
-| A meeting with 3–4 attendees, 2 rounds | 3–6 points |
+| A meeting, per round | about 40–60k tokens per attendee, mostly fixed overhead, so a 3-attendee round is about 150k tokens. Guess 3–6 points until your log says otherwise |
 | QA review of a run's work | 2–4 points |
 | Weekly QA sweep | 4–8 points |
 | Research phase for a new project | 10–20 points |

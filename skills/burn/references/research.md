@@ -46,11 +46,11 @@ Cut to about 5 that pass the gate. Prefer variety: don't shortlist five versions
 - **Demand:** at least 3 independent signals (different people, different places). Link each one.
 - **Competitors:** the top 3–5, each with a link, its price, and the most common complaint about it.
 - **Money:** how similar products charge, with links to their pricing pages.
-- **Build sketch:** the MVP in 3–5 bullets, the likely stack, and which enabled provider hosts it.
+- **Build sketch:** the MVP in 3–5 bullets, the likely stack, and which enabled provider hosts it. If no enabled provider can host the product (GitHub alone can't, see [providers/github.md](providers/github.md)), say so, open a `secret` item asking for one (Cloudflare is the usual pick: `npx wrangler login`), and score running cost accordingly.
 
 Evidence rules:
 
-- Only link pages you actually opened. If you couldn't open one, don't cite it.
+- Stage 1 may cite search-result links, marked `(search)`. Stage 2 evidence must be pages you actually opened. If you couldn't open one, don't cite it.
 - Quotes stay short: under 15 words, one per source, in quotation marks. Summarize the rest in your own words.
 - Write the date you checked next to anything that changes (prices, review counts).
 - One angry post is an anecdote. Three people in different places is a pattern.

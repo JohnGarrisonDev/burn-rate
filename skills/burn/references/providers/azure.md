@@ -36,9 +36,9 @@ Pass: JSON with `id` and `name`. Then confirm it's the burn subscription:
 az account show --query id --output tsv
 ```
 
-Compare with the value at `subscription_id_from`. If they differ, run `az account set --subscription <id>` and check again. If `az account show` fails ("Please run 'az login'"), open a `secret` item:
+Compare with the value at `subscription_id_from`. If they differ, don't change the CLI's default subscription (other tools on the machine use it). Instead pass `--subscription <id>` on every `az` command this run, and check it once: `az account show --subscription <id> --query id --output tsv`. The commands below leave it out for brevity; add it. If `az account show` fails ("Please run 'az login'"), open a `secret` item:
 
-> Run `az login`, then `az account set --subscription <burn subscription id>`. Or create a service principal with Contributor on the burn subscription only and set AZURE_CLIENT_ID, AZURE_TENANT_ID and AZURE_CLIENT_SECRET.
+> Run `az login`. Or create a service principal with Contributor on the burn subscription only and set AZURE_CLIENT_ID, AZURE_TENANT_ID and AZURE_CLIENT_SECRET.
 
 With a service principal in env vars: `az login --service-principal -u "$AZURE_CLIENT_ID" -t "$AZURE_TENANT_ID" --password "$AZURE_CLIENT_SECRET"` (the `--password` flag takes the secret; reference the env var, never paste the value).
 
@@ -96,15 +96,26 @@ az webapp create -n <slug>-app -g rg-<slug> -p plan-<slug> --runtime "NODE:20-lt
 
 ## Deploy
 
-Static Web Apps (preview environments are free and named):
+Static Web Apps (preview environments are free and named). The deployment token never goes to disk: put it in the `SWA_CLI_DEPLOYMENT_TOKEN` environment variable for this shell, which the SWA CLI reads, and clear it afterwards.
+
+Bash (Git Bash on Windows):
 
 ```
-az staticwebapp secrets list -n <slug> -g rg-<slug> --query properties.apiKey -o tsv > .swa-token   # gitignored
-npx swa deploy ./dist --env preview-<run> --deployment-token "$(cat .swa-token)"
-npx swa deploy ./dist --env production    --deployment-token "$(cat .swa-token)"
+export SWA_CLI_DEPLOYMENT_TOKEN="$(az staticwebapp secrets list -n <slug> -g rg-<slug> --query properties.apiKey -o tsv)"
+npx swa deploy ./dist --env preview-<run>
+npx swa deploy ./dist --env production
+unset SWA_CLI_DEPLOYMENT_TOKEN
 ```
 
-Delete `.swa-token` after deploying, or set it as `SWA_CLI_DEPLOYMENT_TOKEN` in the session. Never print it.
+PowerShell:
+
+```
+$env:SWA_CLI_DEPLOYMENT_TOKEN = az staticwebapp secrets list -n <slug> -g rg-<slug> --query properties.apiKey -o tsv
+npx swa deploy ./dist --env preview-<run>
+Remove-Item Env:SWA_CLI_DEPLOYMENT_TOKEN
+```
+
+Never print it, and never pass it as `--deployment-token` (it would show in the process list and the transcript).
 
 App Service: `az webapp deploy -g rg-<slug> -n <slug>-app --src-path app.zip --type zip`. F1 has no slots, so the preview is a second F1 app (`<slug>-preview`) in the same plan.
 

@@ -4,7 +4,7 @@
 Burn Rate is your agent doing work you asked for, in your own repos, under your own account, within your plan's limits. It doesn't share accounts, get around rate limits, or resell access. Read your provider's terms for yourself, though. You're the one agreeing to them.
 
 **Will it actually make money?**
-Probably not much, at least not soon. It picks ideas with a plausible way to make money and tries to get there. Treat any revenue as a bonus. The quota was going to expire anyway.
+Probably not much, at least not soon. It picks ideas with a plausible way to make money and tries to get there. Treat any revenue as a bonus.
 
 **How much of my week does it use?**
 Whatever's left at the end of the week, up to the target you set (95% by default). If you've used 90% yourself by Friday, it does very little. If you've barely touched it, it does a lot.

@@ -56,6 +56,8 @@ SECRET_PATTERNS = [
     ("AWS access key", re.compile(r"(?<![A-Za-z0-9])(?:AKIA|ASIA)[0-9A-Z]{16}(?![0-9A-Z])")),
     ("private key", re.compile(r"-----BEGIN [A-Z ]*(?:PRIVATE KEY|CERTIFICATE)")),
     ("credential in URL", re.compile(r"[a-z][a-z0-9+.\-]*://[^\s:/@]+:[^\s@/]+@", re.I)),
+    ("webhook URL", re.compile(
+        r"https?://(?:[a-z0-9-]+\.)?(?:discord(?:app)?\.com/api/webhooks|hooks\.slack\.com)/\S+", re.I)),
     ("key=value secret", re.compile(
         r"(?i)(?:api[_-]?key|key|token|secret|password|passwd|pwd|auth)[\"']?\s*[=:]\s*[\"']?"
         r"(?=[A-Za-z0-9+/_\-=]*\d)(?=[A-Za-z0-9+/_\-=]*[A-Za-z])[A-Za-z0-9+/_\-=]{20,}")),
@@ -281,6 +283,11 @@ def main(argv=None):
                   "note": note or "notifications are off ([notify].channel = \"none\")"})
             return 0
         if channel == "claude-push":
+            if args.dry_run:
+                emit({"ok": True, "delivered": False, "channel": "claude-push", "dry_run": True,
+                      "note": "dry run: would ask you to call the PushNotification tool with "
+                              "this title and message"})
+                return 0
             emit({"ok": True, "delivered": False, "channel": "claude-push",
                   "note": "call the PushNotification tool with this title and message "
                           "(load it with ToolSearch if it's deferred). If it isn't available, "

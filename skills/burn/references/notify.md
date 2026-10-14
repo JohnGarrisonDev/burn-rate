@@ -53,7 +53,7 @@ python ../burn/scripts/notify.py --title "NH-007 (cost)" \
   --priority high --url https://github.com/jdoe/invoice-snap/blob/main/burn/NEEDS_HUMAN.md
 ```
 
-The path is relative to the calling skill's folder. From the `burn` skill itself it's `scripts/notify.py`. Use `python`, not `python3`, on Windows. In PowerShell, put the command on one line or use a backtick for line breaks.
+The path is relative to the calling skill's folder. From the `burn` skill itself it's `scripts/notify.py`. Your working directory is usually the project clone, so resolve the burn skill's folder to an absolute path first and run `python <abs path to burn skill>/scripts/notify.py ...`. Use `python`, not `python3`, on Windows. In PowerShell, put the command on one line or use a backtick for line breaks.
 
 | Flag | Meaning |
 |---|---|

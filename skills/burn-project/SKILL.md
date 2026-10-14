@@ -32,15 +32,15 @@ gh repo clone <owner>/<slug> <burn home>/workspace/<slug>
 
 `<owner>` is `github_owner` from config. If that's empty, use `gh api user --jq .login`, and write it into `github_owner` in config (keep the comments). Always `--private`. Making a repo public is a human gate.
 
-If `can_create_repos` is false or `gh` isn't logged in, don't stop. Create the folder, `git init` it, and do steps 3–5 locally. Open a `blocker` item in `NEEDS_HUMAN.md` ([../burn/references/human-inbox.md](../burn/references/human-inbox.md)) asking the human to create the repo (give the exact `gh repo create` command, or "please run `gh auth login`"). When it's answered, a later run adds the remote with `git remote add origin` and pushes.
+If `can_create_repos` is false or `gh` isn't logged in, don't stop. Create the folder, `git init` it, and do steps 3–5 locally. Open an item in `NEEDS_HUMAN.md` ([../burn/references/human-inbox.md](../burn/references/human-inbox.md)): a `secret` item if `gh` isn't logged in ("please run `gh auth login`"), or a `blocker` item asking the human to create the repo if `can_create_repos` is false (give the exact `gh repo create` command). When it's answered, a later run adds the remote with `git remote add origin` and pushes.
 
 ### 3. Seed the repo
 
 In the clone:
 
-1. Copy [../burn/templates/burn/](../burn/templates/burn/) to `burn/`, including the empty `meetings/`, `research/` and `recaps/` folders.
+1. Copy [../burn/templates/burn/](../burn/templates/burn/) to `burn/`, including the empty `meetings/`, `research/`, `recaps/` and `qa/` folders (and `history/`, if the templates have one).
 2. Fill in `burn/project.toml`: `slug`, `created` (today), `repos = ["github.com/<owner>/<slug>"]`, `phase = "research"`. Leave `name` empty unless known.
-3. Add the repo to `burn/INFRA.md`: `| github | repo (private) | <owner>/<slug> | n/a | free | 0 | <date> | burn-project new |`.
+3. Add the repo to `burn/INFRA.md`: `| github | repo (private) | <owner>/<slug> | n/a | free | 0 | none | <date> | burn-project new |` (nine cells; "Secrets it needs" is `none`).
 4. Write a minimal `README.md`:
 
    ```markdown
@@ -54,9 +54,15 @@ In the clone:
 5. Write a `.gitignore` that keeps secrets and build output out:
 
    ```
-   .env
-   .env.*
+   .env*
    !.env.example
+   .dev.vars
+   .swa-token
+   .netlify/
+   .neon
+   supabase/.env*
+   backup.sql
+   *.sql.gz
    node_modules/
    dist/
    build/
@@ -69,13 +75,20 @@ In the clone:
    Thumbs.db
    ```
 
-6. Commit and push to `main`:
+6. Write a `.gitattributes` so line endings don't churn between Windows and everything else:
+
+   ```
+   * text=auto eol=lf
+   ```
+
+7. Commit and push to `main`, then record the remote's default branch (a repo created empty doesn't have it yet, and `burn-export` needs it):
 
    ```
    git add -A
    git commit -m "Start project <slug>"
    git branch -M main
    git push -u origin main
+   git remote set-head origin --auto
    ```
 
 ### 4. Register it
@@ -104,7 +117,7 @@ Once research has named the product (stage 5 in [../burn/references/research.md]
    ```
 
    Keep the remote's existing form: if `git remote get-url origin` was SSH, use the SSH URL.
-3. Update `burn/project.toml` (`name`, `slug`, `repos`) and the repo row in `burn/INFRA.md` (add "renamed from <old-slug>"). Commit `Rename project to <new-slug>` and push.
+3. Update `burn/project.toml` (`name`, `slug`, `repos`), the repo row in `burn/INFRA.md` (add "renamed from <old-slug>"), and the `# ` heading in `README.md` (it still shows the temporary slug). Commit `Rename project to <new-slug>` and push.
 4. Move the clone: `cd` to the burn home first, then rename `workspace/<old-slug>` to `workspace/<new-slug>`. If the move fails (on Windows, an open editor or dev server can lock the folder), leave it where it is; `path` can point at the old folder name.
 5. Update the project's block in `projects.toml` (`slug`, `name`, `repo`, `path`) and `active`. Schedules don't need touching.
 
@@ -130,14 +143,14 @@ Only when the human asks (directly or in a STEERING note). Accept a name or a sl
 1. Find the project in `projects.toml`. If it's `archived`, confirm with the user first (a STEERING note that names it counts as confirmation).
 2. Set the current active project's status to `paused`, the new one's to `active`, and `active = "<slug>"`.
 3. Make sure the clone exists (`gh repo clone` it if not) and `git pull --rebase`.
-4. Add a line to the new project's `burn/LOG.md`: `## <date> · switched to this project from <old-slug>`. Commit and push.
+4. Add an entry to the new project's `burn/LOG.md`: `## <date> <time> UTC · switch · <platform>`, then `Switched to this project from <old-slug>.` Commit and push.
 5. Tell the user the project's phase, the top three backlog items and any open human items.
 
 ## archive \<slug\>
 
 Only when the human asks. Archiving changes a status line. It never deletes anything.
 
-1. In the project's repo: add a DECISIONS entry (`Archive the project`, with the reason the human gave) and a LOG line. Commit and push.
+1. In the project's repo: add a DECISIONS entry (`Archive the project`, with the reason the human gave) and a LOG entry (`## <date> <time> UTC · archive · <platform>`). Commit and push.
 2. In `projects.toml`, set `status = "archived"`. If it was active, set `active = ""` and tell the user: with no active project, the next burn run starts a new one. Suggest `switch` to another project, or pausing the schedule, if that's not what they want.
 3. Read the project's `burn/INFRA.md`. List every resource that still exists and its monthly cost. These keep running. Tearing them down is a separate `burn-infra` action that needs the human's OK ([../burn-infra/SKILL.md](../burn-infra/SKILL.md)).
 

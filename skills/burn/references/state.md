@@ -20,7 +20,7 @@ Location: the `BURN_RATE_HOME` environment variable if set, otherwise `~/.burn-r
     claude-usage.json    last rate-limit snapshot from the Claude statusline hook (optional)
   exports/<slug>-<date>/ HANDOFF.md + handoff.json from burn-export
   backups/               skill backups and LOCAL_CHANGES.md from burn-improve (local mode)
-  config.toml.bak-<date> made before any rewrite of config.toml
+  config.toml.bak-<YYYY-MM-DD-HHMM>   made before any edit of config.toml
   .lock                  present while a run is going (see "Run lock")
 ```
 
@@ -56,6 +56,7 @@ burn/
   STEERING.md        notes from the human to the next run
   INFRA.md           every external resource that exists, and free-tier headroom
   SKILL_FEEDBACK.md  retros about the skills themselves (for burn-improve)
+  SKILL_PROPOSALS.md proposed skill edits from burn-improve in `suggest` mode
   GUARDRAILS.md      project-specific extra rules (can only tighten)
   research/          research notes and the idea scorecard
   qa/                weekly QA sweep reports: YYYY-MM-DD-sweep.md
@@ -64,6 +65,8 @@ burn/
 ```
 
 Templates for each live in [../templates/burn/](../templates/burn/). `burn-setup` and `burn-project new` copy that whole folder into the repo as `burn/`.
+
+Ignore anything inside `<!-- -->` in state files. The templates use comments for format examples, dated 2000-01-01 with IDs like `B-0000`; they aren't real entries.
 
 ### project.toml
 
@@ -91,19 +94,39 @@ launch_approved = false    # set true only by applying an approved NH item
 | STEERING.md | humans | Runs read it at the start, apply it, then move applied notes to the "Applied" section with the date. Never delete a human's words. |
 | INFRA.md | burn-infra | Every resource: provider, kind, name/ID, region, tier, monthly cost, created date, created-by run. Plus a free-tier headroom table. |
 | SKILL_FEEDBACK.md | every run (retro) | Append only; burn-improve marks entries as handled. |
+| SKILL_PROPOSALS.md | burn-improve (`suggest` mode) | Append only. The human applies proposals by hand, or switches to `local`. |
+| LOG.md headings | every skill that logs | `## <date> <time> UTC · <kind> · <platform>`, where kind is `run <n> of <m>`, `skipped`, `setup`, `config`, `export`, `import`, `meeting`, `qa`, `teardown`, `switch`, `archive` or `burn-improve`. Only `run` entries count as runs. |
 
 ## Git policy for state
 
 State files always end up on the default branch, even when the code from a run doesn't, so the human can see what's going on from GitHub.
 
 - `git.strategy = "branch-merge"` (default): work on `burn/<YYYY-MM-DD>-<n>`, then merge to the default branch at the end of the run if tests pass. If they don't, leave the branch, write it up in LOG.md, and put a backlog item on top to fix it.
-- `git.strategy = "pr"`: open a PR for the code branch and leave it for the human. Commit state-file changes straight to the default branch at the end of the run.
+- `git.strategy = "pr"` (also used whenever `autonomy.mode = "propose"`): open a PR for the code branch and leave it for the human.
 - `git.strategy = "main"`: commit straight to the default branch. Only for throwaway experiments.
 
 Pull before you start (`git pull --rebase`); the human may have answered inbox items or edited steering notes on GitHub. Push at the end of every run.
 
+**Keep `burn/` edits in their own commits**, never mixed with code. Then the state can always reach the default branch on its own. Either commit state on the default branch as you go (code on the run branch, state on the default branch), or edit it on the run branch and copy `burn/` across at the end as below. Pick one per run.
+
+**When the code doesn't merge** (a `pr` run, red tests, or open QA blockers), put the state on the default branch at the end of the run:
+
+```
+git switch <default>
+git pull --rebase
+git diff --stat <run-branch-start> HEAD -- burn/     # state changed on <default> during the run?
+git checkout <run-branch> -- burn/
+git commit -m "state: <YYYY-MM-DD> run <n>"
+git push
+git switch <run-branch>
+```
+
+`<run-branch-start>` is the commit you branched from (`git merge-base <default> <run-branch>` before you pull). If the `diff` lists files, someone (usually the human, answering on GitHub) changed them during the run, and `checkout` would overwrite their edits. For those files, add your changes on top of theirs by hand instead of checking them out. Never drop a line the human wrote.
+
+When the code branch merges later, its `burn/` changes are already on the default branch. If the merge conflicts in `burn/`, keep the default branch's version of those files, then check nothing from this run went missing.
+
 ## Run lock
 
-Only one run at a time per burn home. At the start, if `~/.burn-rate/.lock` exists and is less than 6 hours old, another run is going: log a one-line "skipped, locked" entry and stop. If it's older, it's stale: delete it and carry on. Write the lock with the current UTC time and platform name. Delete it as the very last step.
+Only one run at a time per burn home. At the start, if `<burn home>/.lock` exists and is less than 6 hours old, another run is going: stop and say so in your final message. Don't touch the repo; the other run is working in it. If the lock is older, it's stale: delete it and carry on. Write the lock with the current UTC time, platform name and skill name. Delete it as the very last step.
 
-The lock is for skills that change company state: `burn`, `burn-research`, `burn-meeting`, `burn-project`, `burn-infra`, `burn-import` and `burn-improve` take it when run on their own (when `burn` calls them mid-run, the run already holds it). Read-only skills (`burn-usage`, `burn-notes` when only showing, `burn-recap` when only showing, `burn-export`) don't need it. `burn-notes` writing an answer just commits a small change; it can skip the lock.
+The lock is for skills that change company state: `burn`, `burn-research`, `burn-meeting`, `burn-project`, `burn-infra`, `burn-qa` (when it changes state), `burn-import` and `burn-improve` take it when run on their own (when `burn` calls them mid-run, the run already holds it). Read-only skills (`burn-usage`, `burn-notes` when only showing, `burn-recap` when only showing, `burn-export`) don't need it. `burn-notes` writing an answer just commits a small change; it can skip the lock.

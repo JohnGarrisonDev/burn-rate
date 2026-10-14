@@ -3,8 +3,11 @@ Install the Burn Rate skills for Claude Code or Codex on Windows.
 
   .\install.ps1 -Platform claude                 # user-wide: ~\.claude\skills
   .\install.ps1 -Platform codex                  # user-wide: ~\.codex\skills
-  .\install.ps1 -Platform claude -Scope project -Project C:\code\myrepo
+  .\install.ps1 -Platform claude -Scope project -Project C:\path\to\folder
   .\install.ps1 -Platform codex -Link            # junction instead of copy
+
+Use user scope. Scheduled runs start in the burn home (~\.burn-rate), so project scope
+only works if that project folder is your burn home.
 
 Running it again updates the skills in place. It only touches folders named burn*.
 #>

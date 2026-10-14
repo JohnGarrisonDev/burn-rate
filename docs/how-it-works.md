@@ -11,7 +11,7 @@ There are three things on your machine and one on GitHub.
 
 ## Why everything is in files
 
-The agent remembers nothing between runs. Each run starts cold, reads the `burn/` folder, does its work, and writes back what the next run needs to know. That sounds limiting, and it is, but it has upsides:
+The agent remembers nothing between runs. Each run starts cold, reads the `burn/` folder, does its work, and writes back what the next run needs to know. It also has upsides:
 
 - You can read exactly what the company knows. There's no hidden state.
 - You can switch from Claude to Codex (or back) and nothing is lost. `burn-export` bundles it all into one handoff document.

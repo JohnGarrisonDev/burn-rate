@@ -2,7 +2,7 @@
 
 A meeting is how the company gets a second opinion. You chair it. Each attendee is a separate sub-agent wearing one role from [roles.md](roles.md), so the positions come from fresh contexts rather than from the same chain of thought that already leans one way. The output is a decision, a short set of action items, and minutes the next run can read.
 
-Meetings cost budget (roughly 3–6 points of weekly usage for 3–4 attendees and two rounds, per [budget.md](budget.md)). Hold them when being wrong would cost more than that.
+Meetings cost budget: each attendee sub-agent costs about 40–60k tokens, mostly fixed overhead, so a 3-attendee round is about 150k tokens ([budget.md](budget.md)). Hold them when being wrong would cost more than that. Log the measured cost (weekly % before and after) in the LOG entry, so the estimate gets better.
 
 ## When to call one
 
@@ -130,7 +130,7 @@ If the decision needs a human (spend, a launch, accepting terms), the decision i
 
 How to launch attendees depends on where you're running. See "Sub-agents" in [platforms.md](platforms.md).
 
-- **Claude (Desktop and CLI):** the Agent tool. Put one Agent call per attendee in a single message so they run in parallel. Use the general-purpose agent type, a short description such as `Meeting: growth position`, and the brief as the prompt. Wait for every result before going on.
+- **Claude (Desktop and CLI):** the Agent tool. Put one Agent call per attendee in a single message so they run in parallel. Use the general-purpose agent type, a short description such as `Meeting: growth position`, and the brief as the prompt. Where the Agent tool lets you pick a model, launch attendees on a smaller one (e.g. `model: "sonnet"`); a position paper doesn't need the biggest model, and it cuts the cost. The QA reviewer ([quality.md](quality.md)) keeps the default model. Wait for every result before going on.
 - **Codex:** ask Codex to spawn one sub-agent per attendee, each with its brief as the task, and to wait for all of them to finish before continuing. Same briefs, same format.
 - **Fallback:** if sub-agents aren't available, or the budget only allows a cheap meeting, play each attendee yourself, one at a time. Read only that role's charter and the brief, write the position in full, then move to the next role. Don't revise earlier positions after reading later ones. It's cheaper but less independent. Mark the minutes `Mode: role-play fallback` and say why.
 
@@ -174,7 +174,7 @@ Anything unresolved, and when to revisit it.
 
 ### Weekly planning
 
-Held on the first run of the usage week (no LOG entry since the previous reset), when `meetings.weekly_planning` is on. Skip it while `phase = "research"`; research is the week's plan.
+Held on the first run of the usage week (no run entry, a LOG heading containing `· run `, since the previous reset), when `meetings.weekly_planning` is on. Skip it while `phase = "research"`; research is the week's plan.
 
 - **Attendees:** product, eng, plus design in `mvp` or growth in later phases. Add legal or ops if a gate or cost item is open.
 - **Inputs for the briefs:** last week's recap (from `burn/recaps/`), open ROADMAP milestones, the top 15 BACKLOG items, STEERING notes applied this run, open NEEDS_HUMAN items, INFRA headroom, and the week's budget (runs left and the points each run can spend, from the planner).
@@ -188,6 +188,15 @@ Held as part of writing the weekly recap, on the last run of the usage week (see
 - **Attendees:** product, eng, ops.
 - **Inputs:** this week's goals (from the planning minutes or the first LOG entry of the week), this week's LOG entries, what merged and deployed, budget planned vs. spent per run, human items opened and answered.
 - **Question:** "What went well, what slipped and why, and what one change should next week make?"
+- **Brief rule:** add "Only suggest changes the company can make itself; anything that needs the human is already in NEEDS_HUMAN.md."
+- **Answer format** (instead of POSITION/REASONS, 150 words maximum):
+  ```
+  WENT WELL:
+  - <up to 2>
+  WENT BADLY:
+  - <up to 2, the worst first, with the cause>
+  ONE CHANGE: <one concrete change for next week>
+  ```
 - **Outputs:** a short "Retro" section in the recap, product changes as BACKLOG items, and problems with the skills themselves as an entry in `burn/SKILL_FEEDBACK.md`. The minutes file is `burn/meetings/YYYY-MM-DD-weekly-retro.md`.
 
 If budget is short at the end of the week, run the retro with the fallback or as chair alone. Don't skip the recap to save the retro.

@@ -12,7 +12,7 @@ Compile the active project's state into two files another agent can pick up cold
 
 Most of the company's state already lives in the product repo's `burn/` folder ([state.md](../burn/references/state.md)). The export's real job is to capture what is **not** in the repo (the burn home's `config.toml`, `projects.toml`, the schedule) and to give a newcomer a one-file summary.
 
-Paths here are relative to this skill's folder. The template is [../burn/templates/HANDOFF.md](../burn/templates/HANDOFF.md). Follow [../burn/references/guardrails.md](../burn/references/guardrails.md), section 3 in particular: an export is one of the places a secret must never go.
+Paths here are relative to this skill's folder. Resolve the burn skill's folder (`../burn/`) to an absolute path first and run scripts as `python <abs path to burn skill>/scripts/...`; the examples keep the short form. The template is [../burn/templates/HANDOFF.md](../burn/templates/HANDOFF.md). Follow [../burn/references/guardrails.md](../burn/references/guardrails.md), section 3 in particular: an export is one of the places a secret must never go.
 
 ## 1. Preconditions
 
@@ -21,7 +21,7 @@ Paths here are relative to this skill's folder. The template is [../burn/templat
 3. Read `projects.toml`. Export the active project unless the user names another slug.
 4. `cd` into the project's workspace clone. Run `git status` and `git log origin/<default>..HEAD --oneline`.
    - Uncommitted changes or unpushed commits: ask the user whether to commit and push them first. The importer clones from the remote, so anything local-only won't make the trip. If they say no, carry on and list it under "Export notes".
-   - Get the default branch (`git symbolic-ref --short refs/remotes/origin/HEAD`), the remote URL, and the HEAD commit.
+   - Get the default branch, the remote URL, and the HEAD commit. For the default branch, try `git symbolic-ref --short refs/remotes/origin/HEAD` (strip the `origin/`). It fails on repos that were created empty; then run `git remote set-head origin --auto` and try again, or ask GitHub: `gh repo view --json defaultBranchRef --jq .defaultBranchRef.name`.
 
 ## 2. Output location
 
@@ -45,14 +45,14 @@ Paths here are relative to this skill's folder. The template is [../burn/templat
 | `burn/DECISIONS.md` | The last 5 titles with IDs. |
 | `burn/INFRA.md` | The resources table, the headroom table. |
 | The scheduler | What's scheduled today: Desktop scheduled tasks (`list_scheduled_tasks`, names starting `burn-rate-`), crontab lines or `schtasks /Query /TN "BurnRate\"` entries. Names and times only. |
-| Skills version | The top version heading in the skills repo's `CHANGELOG.md` if the installed skills are a git clone or link; otherwise `unknown`. |
+| Skills version | The contents of `../burn/VERSION` (one line, e.g. `0.1.0`). If the file is missing, `unknown`. |
 | Skills repo URL | `git remote get-url origin` in the skills folder if it's a clone, else `self_improve.upstream_repo`, else "the burn-rate repo you installed from". |
 
 Backlog lines look like `- [todo] B-0042 · M · eng · Add CSV export — notes here` ([../burn/templates/burn/BACKLOG.md](../burn/templates/burn/BACKLOG.md)). Parse each into `{id, status, size, role, title, notes, section}`. Keep `blocked: NH-007` in `notes`. If a line doesn't parse, keep it as `{raw: "<line>", section}` rather than dropping it.
 
 NH items start with `### NH-007 · cost · 2026-10-17 · <title>` ([human-inbox.md](../burn/references/human-inbox.md)). Parse into `{id, type, date, title, priority, body}`. `priority` is `"high"` if the body has `Priority: high`, else `"normal"`.
 
-INFRA rows become `{provider, kind, name, region, tier, monthly_usd, created, by}`.
+INFRA rows become `{provider, kind, name, region, tier, monthly_usd, secrets, created, by}`. `secrets` is the list of secret names from the "Secrets it needs" column (`[]` for `none`). Names only, never values.
 
 ## 4. Redact
 
@@ -109,7 +109,7 @@ Fill the template. Rules:
                "old_jobs": ["burn-rate-run-1 Thu 22:00", "burn-rate-run-2 Fri 14:00", "burn-rate-run-3 Sat 04:00"]},
   "backlog": [{"id": "B-0024", "status": "todo", "size": "M", "role": "eng", "title": "Cache invoice reads", "notes": "", "section": "Up next"}],
   "needs_human_open": [{"id": "NH-004", "type": "cost", "date": "2026-10-16", "title": "Cloudflare D1 will hit its free row limit in ~2 weeks", "priority": "high", "body": "..."}],
-  "infra": [{"provider": "cloudflare", "kind": "D1", "name": "invoice-snap-prod", "region": "auto", "tier": "free", "monthly_usd": 0, "created": "2026-10-12", "by": "run 2026-10-12-1"}],
+  "infra": [{"provider": "cloudflare", "kind": "D1", "name": "invoice-snap-prod", "region": "auto", "tier": "free", "monthly_usd": 0, "secrets": [], "created": "2026-10-12", "by": "run 2026-10-12-1"}],
   "redactions": ["notify.ntfy_topic"]
 }
 ```

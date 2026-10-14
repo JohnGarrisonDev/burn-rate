@@ -105,6 +105,8 @@ printf %s "$STRIPE_API_KEY" | npx wrangler secret put STRIPE_SECRET_KEY         
 printf %s "$STRIPE_API_KEY" | npx vercel env add STRIPE_SECRET_KEY preview       # Vercel
 ```
 
+On Windows, run these from Git Bash. Windows PowerShell 5.1 adds a trailing newline when it pipes a string to a program, and the newline becomes part of the secret.
+
 The publishable key (`pk_test_...`) can go in front-end config.
 
 ## Custom domain

@@ -85,7 +85,7 @@ fly deploy -a <slug>-preview --ha=false     # preview: a separate app
 fly deploy -a <slug> --ha=false             # production
 ```
 
-`--ha=false` stops flyctl from creating two machines per process group. Production only when `launch_approved = true`. The preview app costs money too; scale it to zero when idle and destroy it when it's not needed (it's in the cap).
+`--ha=false` stops flyctl from creating two machines per process group. Production only when `launch_approved = true`. The preview app costs money too; scale it to zero when idle. If a run created it, a run may also destroy it when it's not needed (`fly apps destroy <slug>-preview --yes`) without an approval, and records that in INFRA.md under **Removed**. The production app is never pruned this way.
 
 ## Secrets
 
@@ -94,7 +94,7 @@ printf 'STRIPE_SECRET_KEY=%s\n' "$STRIPE_SECRET_KEY" | fly secrets import -a <sl
 fly secrets list -a <slug>
 ```
 
-`fly secrets import` reads `NAME=value` lines from stdin, so the value never appears on the command line. Setting secrets restarts machines.
+`fly secrets import` reads `NAME=value` lines from stdin, so the value never appears on the command line. On Windows, run it from Git Bash: Windows PowerShell 5.1 mangles piped strings (it adds a trailing newline and may change the encoding). Setting secrets restarts machines.
 
 ## Custom domain
 

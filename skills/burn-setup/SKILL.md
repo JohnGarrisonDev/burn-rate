@@ -9,11 +9,13 @@ Get a new user from "I cloned the repo" to "the company runs itself on Friday" i
 
 Read [../burn/references/guardrails.md](../burn/references/guardrails.md), [../burn/references/state.md](../burn/references/state.md) and [../burn/references/platforms.md](../burn/references/platforms.md) first.
 
+Paths here are relative to this skill's folder. Resolve the burn skill's folder (`../burn/`) to an absolute path first and run scripts as `python <abs path to burn skill>/scripts/...`; the examples keep the short form. On Windows, give scripts Windows-style or forward-slash paths (`C:/Users/...`), not Git Bash's `/c/Users/...`, which Python can't open.
+
 Keep the conversation short. Offer sensible defaults and let the user just say "yes". Group your questions; don't ask one at a time.
 
 ## 1. Already set up?
 
-Look for `config.toml` in the burn home (`$BURN_RATE_HOME` or `~/.burn-rate`). If it exists, show a summary of it and ask what they want: repair, change settings (hand off to `burn-configure`), add a project (hand off to `burn-project`), or start over. Never overwrite an existing config without a clear yes. Back it up first as `config.toml.bak-<date>`.
+Look for `config.toml` in the burn home (`$BURN_RATE_HOME` or `~/.burn-rate`). If it exists, show a summary of it and ask what they want: repair, change settings (hand off to `burn-configure`), add a project (hand off to `burn-project`), or start over. Never overwrite an existing config without a clear yes. Back it up first as `config.toml.bak-<YYYY-MM-DD-HHMM>` (UTC).
 
 ## 2. Platform and tools
 
@@ -24,8 +26,8 @@ Look for `config.toml` in the burn home (`$BURN_RATE_HOME` or `~/.burn-rate`). I
    |---|---|---|
    | Python 3.11+ | `python --version` (or `python3`) | Needed for the helper scripts. Point to python.org. |
    | git | `git --version` | Required. |
-   | GitHub CLI, logged in | `gh auth status` | Required. Ask them to install it and run `gh auth login`. Product repos are created with it. Needs `repo` scope. |
-   | Provider CLIs | Global: `az version`, `fly version`, `stripe --version`. Project-local or global: `wrangler`, `vercel`, `netlify`, `supabase`, `neonctl` (try the bare command, then `npx --no-install <cli> --version`) | Optional. Note which exist. The project-local ones get installed as dev dependencies in the product repo later, so a missing one isn't a problem. Only the global ones need the user to install them. |
+   | GitHub CLI, logged in | `gh auth status` | Required. Ask them to install it and run `gh auth login`. Product repos are created with it. Needs the `repo` and `workflow` scopes (`gh auth refresh -s repo,workflow` adds them; it's interactive, so they run it). |
+   | Provider CLIs | Global: `az version`, `fly version`, `stripe --version`. Project-local or global: `wrangler`, `vercel`, `netlify`, `supabase`, `neonctl` (try the bare command, then `node_modules/.bin/<cli>` in the current folder). Run the probes in parallel. | Optional. Note which exist. `npx --no-install <cli> --version` can answer from npx's cache even when the CLI isn't installed anywhere; if that's the only hit, call it "available via npx (cached)", not installed. The project-local ones get installed as dev dependencies in the product repo later, so a missing one isn't a problem. Only the global ones need the user to install them. |
 
 3. For each provider CLI that exists, check the login non-interactively (commands are in [../burn/references/providers/](../burn/references/providers/)). Don't run interactive logins yourself. If they want a provider that isn't logged in, give them the exact command to run.
 
@@ -36,11 +38,11 @@ Don't install anything globally yourself. Tell the user what to install and wait
 Ask these together, with defaults filled in:
 
 1. **GitHub owner** for product repos. Default: the logged-in `gh` user (`gh api user --jq .login`). Repos are always private.
-2. **Timezone.** Default: detect it from the system.
+2. **Timezone.** Default: detect it from the system, as an IANA name. On macOS/Linux, `readlink /etc/localtime` or `timedatectl` gives it. On Windows, `tzutil /g` gives a Windows name: map it to IANA ("Central Standard Time" → `America/Chicago`, "Eastern Standard Time" → `America/New_York`, "GMT Standard Time" → `Europe/London`), or ask if you're not sure.
 3. **When to burn.** Default: three runs at 36, 20 and 6 hours before the weekly reset. Explain in one line what that means in their local time once you know the reset (step 4).
 4. **Autonomy.** `act` (default: it decides and ships; only human gates wait) or `propose` (code goes up as PRs, big calls wait for them).
-5. **Notifications.** On Claude Desktop the default is the built-in push. Elsewhere, ntfy: generate a random topic like `burn-` plus 12 random lowercase letters and digits, and tell them to install the ntfy app and subscribe to it. Or a Discord/Slack webhook (stored as `env:BURN_WEBHOOK_URL`, never in the file), Pushover, or none.
-6. **Hosting providers** to enable. Default: the ones whose CLI is installed and logged in. Plus GitHub, always.
+5. **Notifications.** On Claude Desktop the default is the built-in push; also offer an ntfy topic as a fallback, for when the push tool isn't available. Elsewhere, ntfy: generate a random topic like `burn-` plus 12 random lowercase letters and digits, and tell them to install the ntfy app and subscribe to it. Or a Discord/Slack webhook (stored as `env:BURN_WEBHOOK_URL`, never in the file), Pushover, or none.
+6. **Hosting providers** to enable. Default: the ones whose CLI is installed and logged in. Plus GitHub, always. GitHub alone can't host the product (see [providers/github.md](../burn/references/providers/github.md)). If no other provider is logged in, recommend Cloudflare (`npx wrangler login`).
 7. **Self-improvement.** Default `suggest`. Mention `local`, and mention `maintainer` for people developing the skills themselves.
 8. **Budget.** Defaults: end the week at 95%, never above 97%. Most people keep these.
 
@@ -61,10 +63,10 @@ Get the weekly reset time and record it as `schedule.weekly_reset` (e.g. `"Sat 1
 - **Codex:** `python ../burn/scripts/usage.py --source codex-sessions`. If it finds nothing, ask them to run any short Codex prompt, then try again.
 - **Claude Code CLI:** offer to install the statusline hook ([../burn/scripts/claude_statusline_hook.py](../burn/scripts/claude_statusline_hook.py)). Show the change before making it:
   - Read `~/.claude/settings.json`. If there's already a `statusLine.command`, save that command to `cache/statusline-wrapped.txt` so the hook passes through to it, and their statusline looks the same.
-  - Set `statusLine` to `{"type": "command", "command": "python <absolute path to the hook>"}`.
+  - Set `statusLine` to `{"type": "command", "command": "python <absolute path to the hook>"}`. Write the path with forward slashes, also on Windows (`C:/Users/...`): Claude Code runs the command through bash, which eats backslashes.
   - The cache fills after their next interactive response. If they decline, runs will be time-boxed instead.
 
-Then run `python ../burn/scripts/usage.py plan` (with `--weekly`/`--resets-at` on Desktop) and show the result, so they see what a run would do this week.
+Then run `python ../burn/scripts/usage.py plan` (on Desktop, pass the `get_usage` numbers with `--weekly`/`--resets-at`/`--five-hour`) and show the result, so they see what a run would do this week. This plan counts today's session as a run; scheduled runs each get about (target − used) / slots.
 
 ## 6. Notifications
 
@@ -74,11 +76,11 @@ Send a test: on Desktop, call the `PushNotification` tool; elsewhere run `python
 
 Work out the run times: take `weekly_reset`, subtract each `hours_before_reset`, convert to their local time, and round to the quarter hour. Show the list ("Thu 10:00 PM, Fri 2:00 PM, Sat 4:00 AM") and get a yes. Then create the jobs per platforms.md:
 
-- **Claude Desktop:** one scheduled task per slot, named `burn-rate-run-1`, `-2`, `-3`, with a weekly cron in local time. The prompt is `Use the burn skill to do a scheduled Burn Rate run.` Then tell them three things:
+- **Claude Desktop:** one scheduled task per slot, named `burn-rate-run-1`, `-2`, `-3`, with a weekly cron. The scheduled-tasks tool runs cron in the computer's own timezone, not `schedule.timezone`. Convert from `weekly_reset` (UTC) into the system timezone for the cron, and if that differs from `schedule.timezone`, show the times in both. The prompt is `Use the burn skill to do a scheduled Burn Rate run.` Then tell them three things:
   1. Tasks only run while the app is open, and a missed one runs at the next launch.
   2. Keep the computer awake at those times.
   3. Click "Run now" on one task once, so the tool approvals are saved.
-- **Claude Code CLI / Codex:** show the exact crontab lines or `schtasks` commands, and create them only after a yes. For Claude CLI, also propose the permission allowlist from platforms.md for the burn home's `.claude/settings.json`.
+- **Claude Code CLI / Codex:** show the exact crontab lines or `schtasks` commands, and create them only after a yes. Use the full path to the `claude` or `codex` binary (find it now with `command -v claude`, or `where claude` on Windows) and the flags in platforms.md. For Claude CLI, also propose the permission allowlist from platforms.md for the burn home's `.claude/settings.json`.
 
 Never pick bypass-all-permissions modes for them. If headless runs need broader permissions, explain the trade-off and let them choose.
 
@@ -86,7 +88,15 @@ Never pick bypass-all-permissions modes for them. If headless runs need broader 
 
 Ask: start the company now (research runs in this session, using some of this week's usage), or let the first scheduled run do it?
 
-Either way, create the project now via `../burn-project/SKILL.md` ("new"). This makes the private repo, the workspace clone, the state files and the `projects.toml` entry. If they said "now", go straight into `../burn-research/SKILL.md`.
+Either way, create the project now via `../burn-project/SKILL.md` ("new"). This makes the private repo, the workspace clone, the state files and the `projects.toml` entry.
+
+If they said "now", research runs in this session like a burn run:
+
+1. Take the run lock ("Run lock" in [state.md](../burn/references/state.md)).
+2. Use the step 5 plan's `stop_new_work_pct` and `stop_weekly_pct` as research's budget. Check usage as research goes ([budget.md](../burn/references/budget.md), step 3).
+3. Go into `../burn-research/SKILL.md` ("called from burn-setup"). Stop at the end of a stage when you reach `stop_new_work_pct`; the next scheduled run resumes.
+4. Write a LOG entry for it: `## <date> <time> UTC · run 1 of 1 · <platform>` with the usage numbers and the research stage reached.
+5. Release the lock at step 9.
 
 ## 9. Wrap up
 
@@ -98,4 +108,6 @@ Finish with a short summary:
 - that `burn/NEEDS_HUMAN.md` in the product repo is where the company will ask for things, and that they'll get a push when it does
 - what's not set up yet (providers without logins, a statusline hook they declined), with the command to fix each
 
-Write a first `burn/LOG.md` entry in the project: `setup: <platform>, schedule <times>, notify <channel>`. Commit and push.
+Tell them to re-check the run times after a daylight-saving change: a cron in local time drifts an hour against the UTC reset. `burn-configure` can move them.
+
+Write a `burn/LOG.md` entry in the project: `## <date> <time> UTC · setup · <platform>`, then `Schedule <times>, notify <channel>.` Commit and push. If research ran in this session, release the run lock now.

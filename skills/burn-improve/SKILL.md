@@ -43,14 +43,14 @@ When a top-ranked problem needs a change to protected text, open a `review` item
 
 - Read `self_improve` from `config.toml`. If `mode = "off"`, add `burn-improve: off, skipped` to this run's LOG entry and stop.
 - **Budget.** When `burn` calls you, at least 3 points remain. Each change costs roughly 1–2 points, a maintainer PR with tests 2–3. Check usage after each change ([budget.md](../burn/references/budget.md), step 3) and stop at the run's limit. Unfinished work stays unhandled for next time.
-- When the user runs this directly, there's no run budget, but still keep to the top few problems.
+- When the user runs this directly, there's no run budget, but still keep to the top few problems. Take the run lock per "Run lock" in [state.md](../burn/references/state.md) before reading or tagging feedback (if a run holds it, tell the user and stop), and release it at the end of step 4. When `burn` calls you, the run already holds it.
 
 ## 1. Collect unhandled feedback
 
 1. Read `burn/SKILL_FEEDBACK.md` in the active project's workspace clone (see `projects.toml`).
 2. Also read it in the other registered projects' clones under `workspace/`, if they exist. Don't clone anything just for this.
 3. An entry is a `## <date> · run <n> · <platform>` heading and its bullets (format in [../burn/templates/burn/SKILL_FEEDBACK.md](../burn/templates/burn/SKILL_FEEDBACK.md)). It's unhandled if its heading has no `[handled: ...]` tag. Skip "no issues" entries.
-4. Skip the "Proposed changes" section; that's this skill's own output.
+4. Older installs may have a "Proposed changes" section at the end of SKILL_FEEDBACK.md. Skip it; it's this skill's own output, not feedback.
 
 Fewer than 2 unhandled entries with real problems? Log `burn-improve: nothing to do` and stop.
 
@@ -71,7 +71,7 @@ For each, decide the smallest change that fixes it. Prefer, in order: fixing a w
 
 ### suggest
 
-Write the proposals into the same `burn/SKILL_FEEDBACK.md`, under a `## Proposed changes` heading at the end of the file (create it once, append after that):
+Append the proposals to `burn/SKILL_PROPOSALS.md` in the project repo (create it from [../burn/templates/burn/SKILL_PROPOSALS.md](../burn/templates/burn/SKILL_PROPOSALS.md) if it's missing), newest at the bottom:
 
 ````markdown
 ### P-2026-10-20-1 · burn/references/providers/cloudflare.md · Add D1 migration commands
@@ -104,10 +104,11 @@ Work in `self_improve.skills_repo_path`, a clone of the burn-rate repo. Bundle t
 4. Run the checks from the repo root:
    ```
    python tests/lint_skills.py
+   python tests/lint_style.py
    python -m unittest discover tests
    ```
-   Both must pass. If a small fix makes them pass, make it. If not, drop the change: `git switch -` back, delete the branch, and log why.
-5. **CHANGELOG and version.** `CHANGELOG.md` at the repo root holds the version: newest first, headings like `## 0.3.1 · 2026-10-20`. Read the top version and bump it: **patch** for fixes and clarified instructions, **minor** for new behaviour (a new step, script, or option). Add the new heading with one line per change. If the PR has both, bump minor.
+   All three must pass. If a small fix makes them pass, make it. If not, drop the change: `git switch -` back, delete the branch, and log why.
+5. **CHANGELOG and version.** The version lives in two places that must match: `skills/burn/VERSION` (one line, e.g. `0.3.1`) and the top heading of `CHANGELOG.md` at the repo root (newest first, headings like `## 0.3.1 · 2026-10-20`). Read the current version and bump it: **patch** for fixes and clarified instructions, **minor** for new behaviour (a new step, script, or option). If the PR has both, bump minor. Write the new version to `VERSION` and add the new CHANGELOG heading with one line per change, in the same commit.
 6. Commit: `improve: add D1 migration commands to cloudflare provider doc`, ending with the attribution trailer your platform uses for agent commits, if any.
 7. `git push -u origin <branch>`.
 8. Open the PR:
@@ -122,7 +123,7 @@ Work in `self_improve.skills_repo_path`, a clone of the burn-rate repo. Bundle t
 
 ### upstream issues (opt-in)
 
-Only if `self_improve.upstream_issues = true` and `upstream_repo` is set. Works alongside `suggest` or `local`. In `maintainer` mode, skip it: the PR already covers it.
+Only if `self_improve.upstream_issues = true` and `upstream_repo` is set. Pushing branches, opening PRs (maintainer mode) and filing these issues are the only publishing this skill does, under the exception in [guardrails.md](../burn/references/guardrails.md) section 4. Works alongside `suggest` or `local`. In `maintainer` mode, skip it: the PR already covers it.
 
 For each change you made or proposed this session, at most 2 per session:
 
@@ -150,5 +151,6 @@ Add the issue URL to the entry's tag: `[handled: local 2026-10-20, backup ..., i
    Leave unchosen entries untagged; they'll be ranked again next time.
 2. Add a line to this run's LOG entry. `burn` counts these lines to decide when to call you again, so always start it with `burn-improve:`:
    `burn-improve: maintainer, 7 entries read, 2 changes (PR https://github.com/jdoe/burn-rate/pull/14), 1 to NH-012, 1 declined.`
-3. Commit `burn/SKILL_FEEDBACK.md` (and NEEDS_HUMAN.md if changed) in each project repo you tagged entries in, and push. When `burn` called you, it commits the active project's files in its own handoff.
+   When the user ran you directly, there's no run entry: write your own, `## <date> <time> UTC · burn-improve · <platform>`, with that line under it.
+3. Commit `burn/SKILL_FEEDBACK.md` (and `SKILL_PROPOSALS.md` and NEEDS_HUMAN.md if changed) in each project repo you tagged entries in, and push. When `burn` called you, it commits the active project's files in its own handoff.
 4. A new NH item gets a notification like any other ([notify.md](../burn/references/notify.md)). A PR doesn't need one; the run summary mentions it.

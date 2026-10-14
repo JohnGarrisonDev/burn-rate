@@ -108,7 +108,7 @@ rm supabase/.env.functions
 npx supabase secrets list --project-ref <ref>
 ```
 
-Get project keys for the hosting provider with `npx supabase projects api-keys --project-ref <ref>` and pipe them straight into the host's secret command. Don't print them in the transcript.
+Get project keys for the hosting provider with `npx supabase projects api-keys --project-ref <ref>` and pipe them straight into the host's secret command. Don't print them in the transcript. On Windows, run these from Git Bash. Windows PowerShell 5.1 adds a trailing newline when it pipes a string to a program, and the newline becomes part of the secret.
 
 ## Custom domain
 
