@@ -27,7 +27,7 @@ Follow [references/budget.md](references/budget.md) steps 1 and 2. Get usage, th
 
 ## 2. Open the project
 
-- Read `projects.toml` for the active project. If there are no projects, start one: follow `../burn-project/SKILL.md` ("new") and stop after research if the budget is spent.
+- Read `projects.toml` for the active project. If there are no projects, or none is active (`active = ""`, e.g. after an archive), start one: follow `../burn-project/SKILL.md` ("new") and stop after research if the budget is spent. Exception: if every project is `paused` and STEERING or config says the human paused them, log that and stop.
 - `cd` into the project's workspace clone. `git status`. If the last run left uncommitted changes, look at them: finish and commit them if they're coherent, otherwise stash them on a branch named `burn/rescue-<date>` and note it.
 - `git pull --rebase` on the default branch.
 - If `burn/project.toml` says `phase = "research"`, or `burn/VISION.md` is still the empty template, run the research procedure in `../burn-research/SKILL.md`. That's this run's work. Then skip to step 7.

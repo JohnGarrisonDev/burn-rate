@@ -29,6 +29,8 @@ If the detected platform differs from `config.toml`, use what you detected for t
 
 Runs are placed relative to the weekly reset: `schedule.hours_before_reset` in config. Turn each into a real local day and time from `schedule.weekly_reset`. Example: reset Sat 13:59 UTC, slots `[36, 20, 6]` → Fri 01:59 UTC, Fri 17:59 UTC, Sat 07:59 UTC. Round to the nearest quarter hour.
 
+Scheduled runs always start in the **burn home**, never in a project folder. The `burn` skill finds the active project from `projects.toml` itself, so renaming, switching or adding projects never breaks the schedule.
+
 The prompt every scheduled run uses is the same:
 
 ```
@@ -56,12 +58,12 @@ Headless command:
 claude -p "Use the burn skill to do a scheduled Burn Rate run." --permission-mode acceptEdits
 ```
 
-Runs need to use git, gh and provider CLIs without prompting. Rather than reaching for blanket bypass flags, set up an allowlist in the product repo's `.claude/settings.json` (`permissions.allow` for `Bash(git *)`, `Bash(gh *)`, `Bash(npm *)`, `Bash(python *)`, the enabled provider CLIs, and so on). Show the user the list and get an OK before writing it.
+Runs need to use git, gh and provider CLIs without prompting. Rather than reaching for blanket bypass flags, set up an allowlist in the burn home's `.claude/settings.json` (it covers every project under `workspace/`) (`permissions.allow` for `Bash(git *)`, `Bash(gh *)`, `Bash(npm *)`, `Bash(python *)`, the enabled provider CLIs, and so on). Show the user the list and get an OK before writing it.
 
-- **macOS/Linux**: a crontab line per slot, e.g. `0 22 * * 4 cd ~/.burn-rate/workspace/<slug> && claude -p "..." >> ~/.burn-rate/cron.log 2>&1`
+- **macOS/Linux**: a crontab line per slot, e.g. `0 22 * * 4 cd ~/.burn-rate && claude -p "..." >> ~/.burn-rate/cron.log 2>&1`
 - **Windows**: Task Scheduler, one weekly trigger per slot:
   ```
-  schtasks /Create /TN "BurnRate\run-1" /SC WEEKLY /D THU /ST 22:00 /TR "cmd /c cd /d %USERPROFILE%\.burn-rate\workspace\<slug> && claude -p \"Use the burn skill to do a scheduled Burn Rate run.\" >> %USERPROFILE%\.burn-rate\cron.log 2>&1"
+  schtasks /Create /TN "BurnRate\run-1" /SC WEEKLY /D THU /ST 22:00 /TR "cmd /c cd /d %USERPROFILE%\.burn-rate && claude -p \"Use the burn skill to do a scheduled Burn Rate run.\" >> %USERPROFILE%\.burn-rate\cron.log 2>&1"
   ```
 
 Show the exact command and get an OK before creating any OS scheduled job.
@@ -74,7 +76,7 @@ Headless command:
 codex exec --full-auto "Use the burn skill to do a scheduled Burn Rate run."
 ```
 
-`--full-auto` runs inside Codex's workspace sandbox with network access governed by the user's Codex config. The run needs network for git, gh and deploys. If Codex's sandbox blocks network, tell the user which setting to change rather than switching to a "dangerous/bypass" mode yourself.
+Start it in the burn home (`cd ~/.burn-rate`), so the workspace clones are inside Codex's writable sandbox. `--full-auto` runs inside Codex's workspace sandbox with network access governed by the user's Codex config. The run needs network for git, gh and deploys. If Codex's sandbox blocks network, tell the user which setting to change rather than switching to a "dangerous/bypass" mode yourself.
 
 Schedule it with cron or Task Scheduler exactly as for the Claude CLI, swapping the command. If the user's Codex install has its own automations feature, it's fine to use that instead. Check `codex --help` for what's available.
 

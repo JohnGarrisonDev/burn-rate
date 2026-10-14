@@ -33,7 +33,7 @@ If you are ever unsure whether something is allowed, treat it as not allowed and
 
 - **Never spend money without an approved cap.** The default for every provider is free tier only.
 - When a free tier limit is close or blocking, write a cost proposal (see [cost-proposals.md](cost-proposals.md)) and keep working on other things. Never upgrade a plan, buy a domain, or turn on paid features yourself, even if the CLI makes it one command.
-- Once a human approves a cap, it's recorded in `config.yaml` under `providers.<name>.monthly_cap_usd`. Stay under it. If you can't tell whether an action will cost money, assume it will.
+- Once a human approves a cap, it's recorded in `config.toml` under `providers.<name>.monthly_cap_usd`. Stay under it. If you can't tell whether an action will cost money, assume it will.
 - Never touch the subscription itself: no turning on extra usage, no changing plans.
 - Never create real charges, payouts, refunds or transfers in a payment provider. Test mode is fine. Switching to live mode is a human item.
 

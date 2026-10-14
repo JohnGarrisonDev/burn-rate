@@ -20,7 +20,7 @@ After setup, click "Run now" on one of the tasks once. Any tool approvals you gi
 - **Install:** same as Desktop.
 - **Usage:** Claude Code passes your rate limits to the statusline. Setup offers a small hook that saves them to `~/.burn-rate/cache/claude-usage.json` so headless runs can read them. If you already have a statusline, the hook passes everything through to it, so yours looks the same. The numbers refresh whenever you use Claude Code interactively. A headless run may see numbers a few hours old and treats them as a minimum.
 - **Schedule:** cron on macOS/Linux, Task Scheduler on Windows, running `claude -p "Use the burn skill to do a scheduled Burn Rate run."`. Setup shows you the exact lines before adding them.
-- **Permissions:** headless runs need to use git, gh, npm and your provider CLIs without asking. Setup proposes an allowlist for the company repo's `.claude/settings.json` instead of turning permissions off.
+- **Permissions:** headless runs need to use git, gh, npm and your provider CLIs without asking. Runs start in `~/.burn-rate`, and setup proposes an allowlist for `~/.burn-rate/.claude/settings.json` instead of turning permissions off.
 - **Notifications:** ntfy, a Discord/Slack webhook, or Pushover.
 
 ## Codex

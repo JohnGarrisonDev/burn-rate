@@ -102,3 +102,5 @@ Pull before you start (`git pull --rebase`); the human may have answered inbox i
 ## Run lock
 
 Only one run at a time per burn home. At the start, if `~/.burn-rate/.lock` exists and is less than 6 hours old, another run is going: log a one-line "skipped, locked" entry and stop. If it's older, it's stale: delete it and carry on. Write the lock with the current UTC time and platform name. Delete it as the very last step.
+
+The lock is for skills that change company state: `burn`, `burn-research`, `burn-meeting`, `burn-project`, `burn-infra`, `burn-import` and `burn-improve` take it when run on their own (when `burn` calls them mid-run, the run already holds it). Read-only skills (`burn-usage`, `burn-notes` when only showing, `burn-recap` when only showing, `burn-export`) don't need it. `burn-notes` writing an answer just commits a small change; it can skip the lock.

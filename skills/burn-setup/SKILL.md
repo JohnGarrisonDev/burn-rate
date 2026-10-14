@@ -78,7 +78,7 @@ Work out the run times: take `weekly_reset`, subtract each `hours_before_reset`,
   1. Tasks only run while the app is open, and a missed one runs at the next launch.
   2. Keep the computer awake at those times.
   3. Click "Run now" on one task once, so the tool approvals are saved.
-- **Claude Code CLI / Codex:** show the exact crontab lines or `schtasks` commands, and create them only after a yes. For Claude CLI, also propose the permission allowlist from platforms.md for the product repo's `.claude/settings.json`.
+- **Claude Code CLI / Codex:** show the exact crontab lines or `schtasks` commands, and create them only after a yes. For Claude CLI, also propose the permission allowlist from platforms.md for the burn home's `.claude/settings.json`.
 
 Never pick bypass-all-permissions modes for them. If headless runs need broader permissions, explain the trade-off and let them choose.
 
