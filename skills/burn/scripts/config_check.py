@@ -51,7 +51,7 @@ SECRET_PATTERNS = [
     re.compile(r"://[^/\s:@]+:[^/\s@]+@"),  # credentials inside a URL
 ]
 KNOWN_TOP = {"version", "platform", "github_owner", "budget", "schedule", "autonomy", "git",
-             "meetings", "recap", "notify", "self_improve", "providers"}
+             "meetings", "recap", "notify", "self_improve", "providers", "assets"}
 
 
 def burn_home():
@@ -182,6 +182,7 @@ class Checker:
         self.check_notify()
         self.check_self_improve()
         self.check_providers()
+        self.check_assets()
         self.scan_secrets(c, "")
 
     def check_schedule(self):
@@ -231,6 +232,21 @@ class Checker:
         token = self.location("notify.pushover_token_from", notify=True)
         if channel == "pushover" and not (user and token):
             self.err("notify.pushover_user_from", "channel is pushover but user/token locations are missing")
+
+    def check_assets(self):
+        # Optional section: configs written before it existed are still valid.
+        assets = self.cfg.get("assets")
+        if assets is None:
+            return
+        if not isinstance(assets, dict):
+            self.err("assets", "must be a table")
+            return
+        mode = assets.get("codex_images", "auto")
+        if mode not in ("auto", "on", "off"):
+            self.err("assets.codex_images", f'must be "auto", "on" or "off", got {mode!r}')
+        pct = assets.get("codex_max_weekly_pct", 80)
+        if isinstance(pct, bool) or not isinstance(pct, (int, float)) or not 10 <= pct <= 100:
+            self.err("assets.codex_max_weekly_pct", f"must be a number from 10 to 100, got {pct!r}")
 
     def check_self_improve(self):
         mode = self.choice("self_improve.mode", IMPROVE_MODES)

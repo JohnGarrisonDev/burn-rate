@@ -96,6 +96,27 @@ class ChoiceAndScheduleTests(unittest.TestCase):
         self.assertEqual(errors_for(cfg), [])
 
 
+class AssetsTests(unittest.TestCase):
+    def test_section_is_optional(self):
+        cfg = base()
+        cfg.pop("assets", None)
+        self.assertEqual(errors_for(cfg), [])
+
+    def test_valid_values(self):
+        for mode in ("auto", "on", "off"):
+            cfg = base()
+            cfg["assets"] = {"codex_images": mode, "codex_max_weekly_pct": 60}
+            self.assertEqual(errors_for(cfg), [], mode)
+
+    def test_bad_values(self):
+        for bad in ({"codex_images": "sometimes"}, {"codex_max_weekly_pct": 5},
+                    {"codex_max_weekly_pct": 150}, {"codex_max_weekly_pct": True},
+                    {"codex_max_weekly_pct": "80"}):
+            cfg = base()
+            cfg["assets"] = bad
+            self.assertTrue(errors_for(cfg), bad)
+
+
 class SecretTests(unittest.TestCase):
     def test_credential_must_be_a_location(self):
         cfg = base()

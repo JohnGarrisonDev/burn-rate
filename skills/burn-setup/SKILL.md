@@ -42,9 +42,10 @@ Ask these together, with defaults filled in:
 3. **When to burn.** Default: three runs at 36, 20 and 6 hours before the weekly reset. Explain in one line what that means in their local time once you know the reset (step 4).
 4. **Autonomy.** `act` (default: it decides and ships; only human gates wait) or `propose` (code goes up as PRs, big calls wait for them).
 5. **Notifications.** On Claude Desktop the default is the built-in push; also offer an ntfy topic as a fallback, for when the push tool isn't available. Elsewhere, ntfy: generate a random topic like `burn-` plus 12 random lowercase letters and digits, and tell them to install the ntfy app and subscribe to it. Or a Discord/Slack webhook (stored as `env:BURN_WEBHOOK_URL`, never in the file), Pushover, or none.
-6. **Hosting providers** to enable. Default: the ones whose CLI is installed and logged in. Plus GitHub, always. GitHub alone can't host the product (see [providers/github.md](../burn/references/providers/github.md)). If no other provider is logged in, recommend Cloudflare (`npx wrangler login`).
-7. **Self-improvement.** Default `suggest`. Mention `local`, and mention `maintainer` for people developing the skills themselves.
-8. **Budget.** Defaults: end the week at 95%, never above 97%. Most people keep these.
+6. **Image generation.** If `codex login status` succeeds, say that runs can use their Codex subscription's image tool for illustrations and social images (default `assets.codex_images = "auto"`, stopping at 80% of their Codex week). Run `python ../burn/scripts/codex_image.py --check` and show the result. If they don't want Codex used, set it to `"off"`.
+7. **Hosting providers** to enable. Default: the ones whose CLI is installed and logged in. Plus GitHub, always. GitHub alone can't host the product (see [providers/github.md](../burn/references/providers/github.md)). If no other provider is logged in, recommend Cloudflare (`npx wrangler login`).
+8. **Self-improvement.** Default `suggest`. Mention `local`, and mention `maintainer` for people developing the skills themselves.
+9. **Budget.** Defaults: end the week at 95%, never above 97%. Most people keep these.
 
 Recommend, in one or two sentences, that they use a separate cloud account or subscription for the company and set a billing alert there. The skills' spending caps are a second line of defense, not the first.
 

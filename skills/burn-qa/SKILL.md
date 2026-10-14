@@ -47,7 +47,7 @@ Go through every public page and asset:
 - **Copy:** check it against [../burn/references/style.md](../burn/references/style.md). Quote the line, then give the rewrite.
 - **Claims:** every claim must be true today.
 - **Placeholders:** none left anywhere.
-- **Images and icons:** source and license recorded, sized and compressed, alt text, no stretching or blur.
+- **Images and icons:** every image in the product is listed in `burn/ASSETS.md` with a source and license; sized and compressed; alt text; no stretching, blur, artefacts or garbled text in generated images.
 - **Metadata:** favicon, social preview, titles and descriptions.
 - **Brand:** consistent use of colour, type and voice.
 

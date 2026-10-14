@@ -90,6 +90,7 @@ For each item:
 While working:
 
 - Infra, hosting and deploys go through the `burn-infra` procedure (`../burn-infra/SKILL.md`). Never create cloud resources any other way.
+- Images, icons and illustrations follow [references/assets.md](references/assets.md): SVG or a permissive icon set first. When the product needs a generated image (illustration, social preview, texture), use Codex's image tool through `scripts/codex_image.py` if `--check` says it's available. That's the person's Codex subscription, not this run's budget, and it works from Claude runs too. Log every asset in `burn/ASSETS.md`.
 - Anything that needs a human becomes an inbox item ([references/human-inbox.md](references/human-inbox.md)) plus a notification. Mark the backlog item `blocked: NH-007` and move on to the next item. Never sit and wait.
 - When you make a real decision (stack, architecture, scope, pricing), add it to DECISIONS.md.
 - When you notice something wrong with the *skills themselves* (missing steps, wrong instructions, a script that should exist), jot it down for the retro.

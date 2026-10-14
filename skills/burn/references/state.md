@@ -56,6 +56,7 @@ burn/
   STEERING.md        notes from the human to the next run
   INFRA.md           every external resource that exists, and free-tier headroom
   SKILL_FEEDBACK.md  retros about the skills themselves (for burn-improve)
+  ASSETS.md          every image, icon and illustration the product ships: source, license, prompt
   SKILL_PROPOSALS.md proposed skill edits from burn-improve in `suggest` mode
   GUARDRAILS.md      project-specific extra rules (can only tighten)
   research/          research notes and the idea scorecard

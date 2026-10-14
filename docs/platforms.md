@@ -36,6 +36,10 @@ After setup, click "Run now" on one of the tasks once. Any tool approvals you gi
 
 Install for your user (the default). Both install scripts also take a project scope (`--scope project`, or `-Scope project`), which puts the skills in one folder's `.claude/skills/` or `.agents/skills/`. Scheduled runs start in the burn home (`~/.burn-rate`), so a project-scope install only works if that project folder is your burn home. If you're not sure, use user scope.
 
+## Images from Codex, on any platform
+
+If Codex is installed and logged in, runs can use its built-in image tool for illustrations, textures and social preview images, even when Claude is running the burn. It uses your Codex subscription, not Claude's, and stops once Codex's own week reaches 80% (`assets.codex_max_weekly_pct`). Codex runs read-only for this: it draws the image and hands back a file, nothing else. Turn it off with `assets.codex_images = "off"`.
+
 ## Switching platforms
 
 Run `burn-export` on the old setup. It writes a `HANDOFF.md` (plus a JSON file) that holds everything except secrets. Install the skills on the new platform and run `burn-import` with that file. The company's repo doesn't move. Only your settings, schedule and logins need recreating.

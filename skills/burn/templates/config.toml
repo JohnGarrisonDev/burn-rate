@@ -91,6 +91,17 @@ every_n_runs = 3
 upstream_issues = false
 upstream_repo = ""
 
+[assets]
+# Generate images (illustrations, social previews) with the person's own Codex subscription,
+# via Codex's built-in image tool. Works from Claude runs too. See references/assets.md.
+#   auto: use it when `codex` is installed, logged in and under the limit below (default)
+#   on:   same checks; say so in the log when it isn't available
+#   off:  never; use SVG and permissive icon sets only
+codex_images = "auto"
+# Stop using Codex for images once Codex's own weekly usage reaches this %.
+# It's a separate subscription; this keeps some of it for the person.
+codex_max_weekly_pct = 80
+
 # Hosting and services. One table per provider. Only enabled providers are used.
 # credential: where the secret comes from. cli:<tool> means "already logged in with that CLI".
 # monthly_cap_usd: 0 means free tier only. Raised only by approving a cost proposal.

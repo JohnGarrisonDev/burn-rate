@@ -4,6 +4,8 @@ Your Claude or Codex subscription resets every week whether you used it or not. 
 
 You install a set of agent skills, answer a few setup questions, and walk away. Near the end of each usage week, scheduled runs check how much quota you have left and spend it on the company. In week one it researches what to build and picks something. After that it writes the code, tests it, deploys it, drafts the landing page, holds meetings with itself, and keeps notes on everything. Nothing merges until a QA review has checked it. On Monday you read a recap of what it did.
 
+If you also have a Codex subscription, runs can use its image tool for illustrations and social images, even when Claude is doing the work.
+
 It's an experiment. The company might never make a dollar. But the quota was going to expire anyway.
 
 ## What a week looks like

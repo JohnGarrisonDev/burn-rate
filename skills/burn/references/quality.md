@@ -34,7 +34,7 @@ An item isn't `done` until all of these that apply are true.
 - No placeholder text (`Lorem ipsum`, `TODO`, `Your Company`, `example.com`) anywhere a user could see it.
 
 ### Assets
-- **Images and icons:** made for the product or properly licensed. Record the source and license in `burn/DECISIONS.md` unless it's the project's own icon set or a permissive set (e.g. Lucide, Heroicons). No watermarked, low-resolution or stretched images. No AI-generated pictures of people presented as real customers.
+- **Images and icons:** made for the product or properly licensed, and listed in `burn/ASSETS.md` with source, license and (for generated images) the prompt. See [assets.md](assets.md). No watermarked, low-resolution or stretched images. No AI-generated pictures of people presented as real customers.
 - **Formats:** compressed and sized for their use (WebP/AVIF for photos, SVG for icons and logos). Each has explicit dimensions so the layout doesn't jump.
 - **Metadata:** a favicon, social preview image (1200×630) and page titles/descriptions exist before launch.
 

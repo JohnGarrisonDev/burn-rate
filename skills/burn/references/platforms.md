@@ -12,6 +12,7 @@ Burn Rate runs on three platforms. The skills are the same everywhere; only the 
 | Scheduling | Desktop scheduled tasks, one per slot | one hourly job running `run_burn` (gate) | one hourly job running `run_burn` (gate) |
 | Sub-agents | Agent tool | Agent tool | Codex sub-agents |
 | Notifications | `PushNotification` tool, or ntfy | ntfy / webhook | ntfy / webhook |
+| Image generation | Codex's image tool via `scripts/codex_image.py`, if Codex is logged in | same | built in (`$imagegen`) |
 
 Claude Desktop's Code tab and the Claude Code CLI share the same skills folder and settings, so one install covers both.
 
