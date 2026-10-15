@@ -2,6 +2,10 @@
 
 Versions follow semver. Patch for fixes, minor for new behavior, major for anything that changes the state file format or config in a way that needs migrating.
 
+## 0.2.1 · 2026-10-15
+
+- platforms.md, Windows notes: put code with backslashes in files, not heredocs (seen in three runs); git worktree cautions for ports, junctioned node_modules and merging (three runs).
+
 ## 0.2.0 · 2026-10-14
 
 - Scheduled runs check the run lock before loading any skill, and skip with one line if another run is still going. The hourly gate does the same before starting an agent. The lock format is defined once in state.md.
