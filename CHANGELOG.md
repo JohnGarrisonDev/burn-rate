@@ -4,6 +4,7 @@ Versions follow semver. Patch for fixes, minor for new behavior, major for anyth
 
 ## 0.2.0 · 2026-10-14
 
+- New skill `burn-switch`: switch to any project from a link, a local folder or a description. It finds the project, parks the current one, reviews the new one (code, tests, CI, issues, what's live, the repo's own agent instructions), asks the human what only they know, and sets up `burn/` so scheduled runs can take over.
 - Scheduled runs check the run lock before loading any skill, and skip with one line if another run is still going. The hourly gate does the same before starting an agent. The lock format is defined once in state.md.
 - Budget (approved by the maintainer, NH-002): runs also stop taking new work when the session's context passes about 70%; measured Max-plan costs per item added next to the rough-cost table.
 - Quality: the Definition of Done now asks for e2e tests under the same security headers production sends. A `<meta>` CSP doesn't reach workers, so a meta-only preview can pass code that production blocks.

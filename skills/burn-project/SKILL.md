@@ -7,7 +7,7 @@ description: Manage Burn Rate projects. new creates a private GitHub repo, sets 
 
 One install runs one active project at a time. Projects are listed in `projects.toml` in the burn home; each one is a private GitHub repo cloned to `workspace/<slug>`. Formats for both are in [../burn/references/state.md](../burn/references/state.md). Read [../burn/references/guardrails.md](../burn/references/guardrails.md) before changing anything.
 
-Subcommands: `new`, `list`, `switch <slug>`, `archive <slug>`. If the user doesn't name one, work out which from what they said, or show `list`.
+Subcommands: `new`, `list`, `switch <slug>` (handed to burn-switch), `archive <slug>`. If the user doesn't name one, work out which from what they said, or show `list`.
 
 **Before any change** (`new`, `switch`, `archive`): find the burn home (`$BURN_RATE_HOME` or `~/.burn-rate`). If `config.toml` isn't there, offer to run `burn-setup` and stop. If a burn run called you, it already holds the run lock. Otherwise, check the lock per "Run lock" in state.md: if a run is going, tell the user and stop.
 
@@ -141,13 +141,7 @@ Add open `NEEDS_HUMAN.md` counts if they're quick to get. Change nothing.
 
 ## switch \<slug\>
 
-Only when the human asks (directly or in a STEERING note). Accept a name or a slug.
-
-1. Find the project in `projects.toml`. If it's `archived`, confirm with the user first (a STEERING note that names it counts as confirmation).
-2. Set the current active project's status to `paused`, the new one's to `active`, and `active = "<slug>"`.
-3. Make sure the clone exists (`gh repo clone` it if not) and `git pull --rebase`.
-4. Add an entry to the new project's `burn/LOG.md`: `## <date> <time> UTC · switch · <platform>`, then `Switched to this project from <old-slug>.` Commit and push.
-5. Tell the user the project's phase, the top three backlog items and any open human items.
+Use the [burn-switch](../burn-switch/SKILL.md) skill. It handles registered projects and also adopts projects Burn Rate didn't create (a GitHub link, a local folder, or a description): it finds the project, parks the current one, reviews where the new one stands and sets up its `burn/` folder. A STEERING note asking for a switch becomes a `decision` item; the human confirms by running burn-switch in person.
 
 ## archive \<slug\>
 

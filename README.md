@@ -60,6 +60,7 @@ Claude Desktop is the smoothest. It knows your exact usage and has scheduling an
 | `burn-notes` | What's happening, what needs you, and leaving notes for the next run. |
 | `burn-usage` | How much quota is left and what the next run will spend. |
 | `burn-configure` | Change settings. |
+| `burn-switch` | Point the company at another project, including one you built yourself: give a link, a folder or a description. It reviews the project and sets up its notes. |
 | `burn-project` | Start a new company, switch, or archive one. |
 | `burn-export` / `burn-import` | Move a company to another platform or machine. |
 | `burn-teardown` | Manual only. Tear down a project's infrastructure, then reset it to zero or retire it. |
