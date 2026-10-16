@@ -17,7 +17,7 @@ An item isn't `done` until all of these that apply are true.
 - **Tests:** new behavior has tests. Bug fixes have a test that failed before the fix. Tests check behavior, not implementation details.
 - **Checks:** the project's full test suite, linter, formatter and type checker pass. No new warnings. Don't disable a rule or skip a test to get green. If a rule is wrong, change it on purpose and record a decision.
 - **Cleanup:** no dead code, commented-out blocks, stray `console.log`/`print`, or TODOs without a backlog ID (`TODO(B-0051)`).
-- **No control characters:** shell and escape layers can turn regex escapes into control characters (`\b` becomes a backspace). `grep -P '[\x00-\x08\x0B\x0C\x0E-\x1F]'` over the changed files finds nothing.
+- **No control characters:** shell and escape layers can turn regex escapes into control characters (`\b` becomes a backspace). `LC_ALL=C.UTF-8 grep -P '[\x00-\x08\x0B\x0C\x0E-\x1F]'` over the changed files finds nothing (Git Bash needs the `LC_ALL` part).
 - **Errors:** handled where they can happen. Users see a useful message, not a stack trace.
 - **Security:** inputs validated at the boundary. Queries parameterized. Auth checked on every protected route. No secrets in code or client bundles.
 - **Fits the code around it:** same patterns, naming and structure. Shared logic lives in one place.
