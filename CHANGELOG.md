@@ -2,6 +2,12 @@
 
 Versions follow semver. Patch for fixes, minor for new behavior, major for anything that changes the state file format or config in a way that needs migrating.
 
+## 0.3.0 · 2026-10-15
+
+- QA review brief: the reviewer runs every command from the workspace clone (the session's working directory can be another checkout), checks copy claims against DECISIONS.md, and checks numbers against their measurement.
+- DECISIONS.md: when an entry's own figures prove wrong, add a short superseding entry with the right number; keep `stack` in project.toml in step with stack decisions.
+- Runs may hand items to sub-agents, in parallel in one clone when their files don't overlap. The agents don't commit; the lead reviews and commits each item by path.
+
 ## 0.2.0 · 2026-10-14
 
 - New skill `burn-switch`: switch to any project from a link, a local folder or a description. It finds the project, parks the current one, reviews the new one (code, tests, CI, issues, what's live, the repo's own agent instructions), asks the human what only they know, and sets up `burn/` so scheduled runs can take over.

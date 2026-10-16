@@ -91,7 +91,7 @@ launch_approved = false    # set true only by applying an approved NH item
 | ROADMAP.md | planning meeting, runs | Milestones get ticked, not deleted. |
 | BACKLOG.md | runs, meetings | Keep it ranked. Every item has an ID (`B-0042`), a size (S = under 30 min, M = about 1 hour, L = several hours, which must be split before you start it), a status (`todo`/`doing`/`done`/`blocked`), and a role (eng, product, design, growth, ops, research, qa). Move done items to the "Done" section with the run date. |
 | LOG.md | every run | Newest first. One entry per run, even a failed or skipped one. |
-| DECISIONS.md | runs, meetings | Append only. Format: `## D-0007 · 2026-10-17 · Use D1 instead of Postgres` then context, decision, alternatives, consequences. To reverse a decision, write a new one that supersedes it. |
+| DECISIONS.md | runs, meetings | Append only. Format: `## D-0007 · 2026-10-17 · Use D1 instead of Postgres` then context, decision, alternatives, consequences. To reverse a decision, write a new one that supersedes it. If an entry's own figures turn out wrong (a later measurement disagrees), add a short superseding entry that states the right number, so readers don't have to reconcile. When a decision changes the stack, update `stack` in `project.toml` in the same commit. |
 | NEEDS_HUMAN.md | runs write items; humans answer | See [human-inbox.md](human-inbox.md). |
 | STEERING.md | humans | Runs read it at the start, apply it, then move applied notes to the "Applied" section with the date. Never delete a human's words. |
 | INFRA.md | burn-infra | Every resource: provider, kind, name/ID, region, tier, monthly cost, created date, created-by run. Plus a free-tier headroom table. |
