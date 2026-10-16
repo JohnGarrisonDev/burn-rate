@@ -140,3 +140,8 @@ See [notify.md](notify.md). Desktop can use the `PushNotification` tool directly
 - Deep paths (the burn home under a long user folder, plus git's object folders) can pass Windows' 260-character limit. Set `git config core.longpaths true` in each workspace clone (repo-local, not global).
 - Pipe secrets from Git Bash with `printf %s "$VAR" | ...`, not from Windows PowerShell 5.1, which adds a trailing newline to piped strings.
 - Don't run `Remove-Item -Recurse` on a folder that contains junctions (`install.ps1 -Link` makes them). It can follow the junction and delete the real skills.
+- Code that contains backslashes (regexes, `\n`, Windows paths) goes into a file with the Write tool, or into a raw string (`r'''...'''`) in Python. Passed through a heredoc or a plain Python string, `\\` collapses to `\` and `\b` becomes a backspace, and the file breaks without an error.
+- Extra git worktrees (state on the default branch while the code branch stays checked out for the QA reviewer) work well, with three cautions:
+  - give each worktree its own preview port, or e2e tests can silently hit another worktree's server;
+  - don't link `node_modules` with a junction: `git worktree remove --force` follows it and deletes the real one. Run `npm ci` in the worktree, or remove the junction first (`cmd /c rmdir <worktree>\node_modules`), and stop any preview server it started;
+  - remove the worktree (after committing) before switching the main clone to the default branch to merge, or `git switch` fails with "already checked out".

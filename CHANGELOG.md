@@ -2,6 +2,10 @@
 
 Versions follow semver. Patch for fixes, minor for new behavior, major for anything that changes the state file format or config in a way that needs migrating.
 
+## 0.2.1 · 2026-10-15
+
+- platforms.md, Windows notes: put code with backslashes in files, not heredocs (seen in three runs); git worktree cautions for ports, junctioned node_modules and merging (three runs).
+
 ## 0.2.0 · 2026-10-14
 
 - New skill `burn-switch`: switch to any project from a link, a local folder or a description. It finds the project, parks the current one, reviews the new one (code, tests, CI, issues, what's live, the repo's own agent instructions), asks the human what only they know, and sets up `burn/` so scheduled runs can take over.
