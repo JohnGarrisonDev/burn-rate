@@ -49,8 +49,9 @@ Before integrating the run branch (step 6 of the `burn` skill), launch a **QA re
 **Brief it with:**
 - the backlog items done this run, with their acceptance notes
 - the diff: `git diff <default-branch>...HEAD`, or for a large diff, `--stat` plus the most important files
-- how to run the tests and the app
+- how to run the tests and the app, and the absolute path of the workspace clone: "Run every command from <clone path> (cd there first), never from any other checkout of the product." Your session's working directory may be a different checkout, even a live one.
 - this file's Definition of Done
+- "Check every factual claim in user-facing copy against `burn/DECISIONS.md`, not only `project.toml`. Check every number against the measurement it comes from, not the first figure you find; a later D-entry or measurement wins."
 - these instructions: "Review only. Don't edit files or commit. Return findings as a list, each with: severity (blocker / should-fix / nit), file:line, what's wrong, and why it matters to a user or maintainer. Cite line numbers from the working tree, not from the diff. Run the tests and the app yourself where you can. Don't report style preferences the linter would catch. If it's good, say so in one line."
 
 **What counts as a blocker:**
