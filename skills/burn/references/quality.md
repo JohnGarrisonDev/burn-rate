@@ -17,6 +17,7 @@ An item isn't `done` until all of these that apply are true.
 - **Tests:** new behavior has tests. Bug fixes have a test that failed before the fix. Tests check behavior, not implementation details.
 - **Checks:** the project's full test suite, linter, formatter and type checker pass. No new warnings. Don't disable a rule or skip a test to get green. If a rule is wrong, change it on purpose and record a decision.
 - **Cleanup:** no dead code, commented-out blocks, stray `console.log`/`print`, or TODOs without a backlog ID (`TODO(B-0051)`).
+- **No control characters:** shell and escape layers can turn regex escapes into control characters (`\b` becomes a backspace). `LC_ALL=C.UTF-8 grep -P '[\x00-\x08\x0B\x0C\x0E-\x1F]'` over the changed files finds nothing (Git Bash needs the `LC_ALL` part).
 - **Errors:** handled where they can happen. Users see a useful message, not a stack trace.
 - **Security:** inputs validated at the boundary. Queries parameterized. Auth checked on every protected route. No secrets in code or client bundles.
 - **Fits the code around it:** same patterns, naming and structure. Shared logic lives in one place.
@@ -82,7 +83,7 @@ Once per usage week, on the first run (after the planning meeting) or the last, 
 The QA reviewer (sub-agent) gets the production URL (or preview if not launched) and does:
 
 1. **Core flows**, end to end, as a new user: land, sign up, do the main thing, pay (test mode), cancel. Playwright scripts for these should live in the repo (`e2e/`) and grow over time. Run them, then also click through by hand.
-2. **Lighthouse** on the home page and the main app page (`npx lighthouse <url> --output=json --quiet --chrome-flags="--headless"`). Targets: Performance ≥ 90, Accessibility ≥ 95, Best Practices ≥ 95, SEO ≥ 90. Below target is a should-fix. Below 70 is a blocker for the next run.
+2. **Lighthouse** on the home page and the main app page (`npx lighthouse <url> --output=json --quiet --chrome-flags="--headless"`). Targets: Performance ≥ 90, Accessibility ≥ 95, Best Practices ≥ 95, SEO ≥ 90. Below target is a should-fix. Below 70 is a blocker for the next run. If Lighthouse can't launch Chrome (`spawn UNKNOWN` from chrome-launcher), start a browser with a remote-debugging port yourself (Playwright's Chromium with `--remote-debugging-port=9222` works) and run `npx lighthouse <url> --port=9222`. If the reviewer can't launch a browser at all, the lead runs Lighthouse and gives it the reports.
 3. **Broken links and assets** (`npx linkinator <url> --recurse`).
 4. **Mobile** check at 375px wide.
 5. **Copy read-through** of every public page, against style.md.

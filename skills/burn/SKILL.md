@@ -94,6 +94,7 @@ While working:
 - Anything that needs a human becomes an inbox item ([references/human-inbox.md](references/human-inbox.md)) plus a notification. Mark the backlog item `blocked: NH-007` and move on to the next item. Never sit and wait.
 - When you make a real decision (stack, architecture, scope, pricing), add it to DECISIONS.md.
 - When you notice something wrong with the *skills themselves* (missing steps, wrong instructions, a script that should exist), jot it down for the retro.
+- **Working with sub-agents.** Run browser checks (Playwright, e2e, screenshots, Lighthouse) yourself, not in a sub-agent: sandboxed agents often can't launch a browser. Don't run them while agents are still editing files the dev server watches, because hot reload restarts the page mid-test and it looks like a flaky test. Wait for those agents, or give them their own worktree. Before waiting on an agent, check `git status` and its notifications. To ask for a status, ask it to report and keep working; "don't edit" stops its work.
 - If you get stuck on the same problem for more than about 3 points of budget, stop. Write up what you tried in the backlog item, mark it `blocked`, and move on. A fresh run with fresh eyes often solves it.
 
 ## 6. QA review, then ship
