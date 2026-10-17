@@ -2,6 +2,12 @@
 
 Versions follow semver. Patch for fixes, minor for new behavior, major for anything that changes the state file format or config in a way that needs migrating.
 
+## 0.3.0 · 2026-10-17
+
+- Runs: e2e and measurements run with nothing heavy alongside, a failure under load counts until an idle re-run passes, and preview servers are restarted after a rebuild before checking headers.
+- Runs stop the servers and browsers they started, by process tree, and remove temporary worktrees before releasing the lock.
+- Weekly QA sweep: read the production console without axe injected (axe's own stylesheet fetch shows as a CSP violation).
+
 ## 0.2.0 · 2026-10-14
 
 - New skill `burn-switch`: switch to any project from a link, a local folder or a description. It finds the project, parks the current one, reviews the new one (code, tests, CI, issues, what's live, the repo's own agent instructions), asks the human what only they know, and sets up `burn/` so scheduled runs can take over.
