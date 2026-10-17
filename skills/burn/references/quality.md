@@ -88,6 +88,7 @@ The QA reviewer (sub-agent) gets the production URL (or preview if not launched)
 5. **Copy read-through** of every public page, against style.md.
 6. **Dependency audit** (`npm audit --omit=dev`, `pip-audit`, or the ecosystem's equivalent). High or critical findings are blockers.
 7. **Error tracking and logs**, if set up: new errors since last week.
+8. **Browser console** on the production build, read once without axe injected: no errors or CSP violations. axe-core fetches its own stylesheet, which a strict CSP reports as a violation while axe runs; that one isn't a product bug.
 
 Write results to `burn/qa/<YYYY-MM-DD>-sweep.md`:
 - a scores table

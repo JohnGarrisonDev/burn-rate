@@ -99,6 +99,7 @@ While working:
 ## 6. QA review, then ship
 
 - Run the full test suite, linters, type checks and the build one last time.
+- Run e2e and measurements with nothing heavy alongside: no Lighthouse browser, extra preview server or agent still editing files. Load makes specs time out like a regression. A failure under load still counts until it passes on an idle re-run. A preview server can cache response headers at startup, so restart it after a rebuild before checking headers or CSP.
 - **QA review.** If this run changed the product (anything outside `burn/`), launch the independent QA reviewer per [references/quality.md](references/quality.md), "QA review". Fix every blocker. Turn should-fixes into `qa` backlog items, or fix them now if they're small. If blockers remain, **don't merge**: leave the branch and put the fix at the top of the backlog.
 - If the weekly QA sweep was planned for this run, do it now and write `burn/qa/<date>-sweep.md`.
 - Integrate per `git.strategy`: merge to the default branch if green (`branch-merge`), open a PR (`pr`), or nothing extra (`main`). If `autonomy.mode = "propose"`, treat the strategy as `pr` whatever config says. Never merge red.
@@ -136,6 +137,7 @@ Everything the next run needs must be in files, on the default branch, pushed.
 
 - If `notify.run_summaries` is on, send one short message ([references/notify.md](references/notify.md)), for example: `Burn run 2/3: shipped CSV export + signup fix. Week at 78%. 1 new item needs you (NH-007).`
 - If a recap was written this run and `recap.enabled` and `recap.notify` are true, send the recap notification now (format in `../burn-recap/SKILL.md`, "Writing a recap"). The push is done, so its link works.
+- Stop every server and browser this run started, by process tree (`taskkill /T /F /PID <pid>` on Windows, `kill -- -<pgid>` elsewhere). Stopping a background task can end only its shell and leave the server holding the port and locking its folder. Then remove temporary worktrees.
 - Release the lock.
 - Your final message (it's what a scheduled run's transcript shows) should be the same short summary, plus anything the human must do.
 
