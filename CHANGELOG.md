@@ -2,6 +2,12 @@
 
 Versions follow semver. Patch for fixes, minor for new behavior, major for anything that changes the state file format or config in a way that needs migrating.
 
+## 0.2.1 · 2026-10-18
+
+- Sub-agent briefs for a fix list every file on the call path (caller and callee), not only the file the finding names.
+- Sub-agents run only the project's own commands; never `npx` a tool the project doesn't list.
+- Quality: changes to the page shell, fonts, first-load scripts or a first-visit dialog get a mobile Lighthouse median of 3, interleaved with a default-branch build, before merge.
+
 ## 0.2.0 · 2026-10-14
 
 - New skill `burn-switch`: switch to any project from a link, a local folder or a description. It finds the project, parks the current one, reviews the new one (code, tests, CI, issues, what's live, the repo's own agent instructions), asks the human what only they know, and sets up `burn/` so scheduled runs can take over.
