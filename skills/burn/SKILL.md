@@ -95,6 +95,8 @@ While working:
 - When you make a real decision (stack, architecture, scope, pricing), add it to DECISIONS.md.
 - When you notice something wrong with the *skills themselves* (missing steps, wrong instructions, a script that should exist), jot it down for the retro.
 - If you get stuck on the same problem for more than about 3 points of budget, stop. Write up what you tried in the backlog item, mark it `blocked`, and move on. A fresh run with fresh eyes often solves it.
+- When a sub-agent fixes a finding, list every file on the fix's call path as its own (the caller and the callee, e.g. the server route as well as the client), not just the file the finding names. A missing file costs a whole extra agent round.
+- Tell sub-agents to run only the project's own commands (its package.json scripts, README, Makefile). Never `npx <tool>` or the like for a tool the project doesn't list: npx runs whatever package has that name.
 
 ## 6. QA review, then ship
 

@@ -27,6 +27,7 @@ An item isn't `done` until all of these that apply are true.
 - **Accessibility:** keyboard reachable, visible focus, labels on inputs, alt text on meaningful images, colour contrast at least 4.5:1 for text. Run axe (via `@axe-core/playwright` or `pa11y`) on changed pages: zero serious or critical issues.
 - **States:** loading, empty, error and success all designed, not left to defaults.
 - **Consistency:** spacing, type and colour from the project's design tokens, not one-off values.
+- **First load:** a change to the page shell, fonts, first-load scripts or what opens on a first visit gets a mobile Lighthouse median of 3, run interleaved with a build of the default branch on the same machine, before merge. Such changes can swap which element is the LCP and cost several points while looking harmless.
 - **Production headers:** e2e tests run against the security headers production sends. Make the preview server send the host's header file (`_headers`, `vercel.json`, `netlify.toml`). A `<meta>` CSP covers the page but not its workers, so a meta-only setup can pass code that production blocks.
 
 ### Copy and content
