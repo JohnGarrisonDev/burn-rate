@@ -26,6 +26,7 @@ An item isn't `done` until all of these that apply are true.
 - **Run it and look.** Build it, start it, open the page, use the feature. On Claude, use a browser tool if one is available. Otherwise use Playwright headless to take screenshots at 375px and 1280px wide, and look at them.
 - **Accessibility:** keyboard reachable, visible focus, labels on inputs, alt text on meaningful images, colour contrast at least 4.5:1 for text. Run axe (via `@axe-core/playwright` or `pa11y`) on changed pages: zero serious or critical issues.
 - **States:** loading, empty, error and success all designed, not left to defaults.
+- **Mock-ups:** when a check is a composite or mock-up rather than the running app, list the states it doesn't show (walking, off-seat, overflow, the item at phone width) and check those in the running app or in code too.
 - **Consistency:** spacing, type and colour from the project's design tokens, not one-off values.
 - **Production headers:** e2e tests run against the security headers production sends. Make the preview server send the host's header file (`_headers`, `vercel.json`, `netlify.toml`). A `<meta>` CSP covers the page but not its workers, so a meta-only setup can pass code that production blocks.
 

@@ -2,6 +2,12 @@
 
 Versions follow semver. Patch for fixes, minor for new behavior, major for anything that changes the state file format or config in a way that needs migrating.
 
+## 0.2.1 · 2026-10-19
+
+- Windows notes: shells cut arguments at a newline and split them at `&`, `|`, `^`. Pass prompts on one line, quote URLs, and check that a tool's report names the URL you asked for.
+- burn: spikes and prototypes stay on their own unmerged branch, with notes in `burn/research/`. Failing test names go into the LOG before any re-run.
+- Quality: a mock-up check also lists the states it can't show and checks them for real.
+
 ## 0.2.0 · 2026-10-14
 
 - New skill `burn-switch`: switch to any project from a link, a local folder or a description. It finds the project, parks the current one, reviews the new one (code, tests, CI, issues, what's live, the repo's own agent instructions), asks the human what only they know, and sets up `burn/` so scheduled runs can take over.
