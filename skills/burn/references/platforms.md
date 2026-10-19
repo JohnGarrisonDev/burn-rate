@@ -137,6 +137,7 @@ See [notify.md](notify.md). Desktop can use the `PushNotification` tool directly
 - Use `python` (or `py`), not `python3`, on Windows.
 - In Git Bash, paths look like `/c/Users/...`. In PowerShell, `C:\Users\...`. Python can't open `/c/...` paths: pass scripts Windows-style or forward-slash paths (`C:/Users/...`).
 - State files use non-ASCII characters (`·`, `→`, `—`). Windows PowerShell 5.1 pipes text to native programs as ASCII and turns them into `?`. Write files from Python with `encoding="utf-8"`, or from Git Bash, never by piping through PowerShell 5.1. After writing a LOG heading, check that the `·` survived; the first-run-of-week check depends on it.
+- Arguments that pass through a shell (`cmd.exe`, or Node's `spawn(..., { shell: true })`) are cut at the first newline and split at `&`, `|` and `^`. Pass prompts on one line, and quote URLs. When a tool reports on a URL (Lighthouse's `finalDisplayedUrl`), check it is the one you asked for before trusting the score.
 - Deep paths (the burn home under a long user folder, plus git's object folders) can pass Windows' 260-character limit. Set `git config core.longpaths true` in each workspace clone (repo-local, not global).
 - Pipe secrets from Git Bash with `printf %s "$VAR" | ...`, not from Windows PowerShell 5.1, which adds a trailing newline to piped strings.
 - Don't run `Remove-Item -Recurse` on a folder that contains junctions (`install.ps1 -Link` makes them). It can follow the junction and delete the real skills.

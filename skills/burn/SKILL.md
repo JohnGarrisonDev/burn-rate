@@ -93,12 +93,13 @@ While working:
 - Images, icons and illustrations follow [references/assets.md](references/assets.md): SVG or a permissive icon set first. When the product needs a generated image (illustration, social preview, texture), use Codex's image tool through `scripts/codex_image.py` if `--check` says it's available. That's the person's Codex subscription, not this run's budget, and it works from Claude runs too. Log every asset in `burn/ASSETS.md`.
 - Anything that needs a human becomes an inbox item ([references/human-inbox.md](references/human-inbox.md)) plus a notification. Mark the backlog item `blocked: NH-007` and move on to the next item. Never sit and wait.
 - When you make a real decision (stack, architecture, scope, pricing), add it to DECISIONS.md.
+- Spikes and throwaway prototypes go on their own branch and are never merged. Their screenshots and notes go to `burn/research/`. If one is ever to be merged, it gets the QA review like any product change.
 - When you notice something wrong with the *skills themselves* (missing steps, wrong instructions, a script that should exist), jot it down for the retro.
 - If you get stuck on the same problem for more than about 3 points of budget, stop. Write up what you tried in the backlog item, mark it `blocked`, and move on. A fresh run with fresh eyes often solves it.
 
 ## 6. QA review, then ship
 
-- Run the full test suite, linters, type checks and the build one last time.
+- Run the full test suite, linters, type checks and the build one last time. If anything fails, write the failing test names into the LOG entry before any re-run, so a flake can be followed up later.
 - **QA review.** If this run changed the product (anything outside `burn/`), launch the independent QA reviewer per [references/quality.md](references/quality.md), "QA review". Fix every blocker. Turn should-fixes into `qa` backlog items, or fix them now if they're small. If blockers remain, **don't merge**: leave the branch and put the fix at the top of the backlog.
 - If the weekly QA sweep was planned for this run, do it now and write `burn/qa/<date>-sweep.md`.
 - Integrate per `git.strategy`: merge to the default branch if green (`branch-merge`), open a PR (`pr`), or nothing extra (`main`). If `autonomy.mode = "propose"`, treat the strategy as `pr` whatever config says. Never merge red.
