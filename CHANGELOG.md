@@ -2,6 +2,12 @@
 
 Versions follow semver. Patch for fixes, minor for new behavior, major for anything that changes the state file format or config in a way that needs migrating.
 
+## 0.2.1 · 2026-10-24
+
+- platforms.md: a "Sub-agents doing work" section: start servers from the agent's own worktree with an explicit port, reviewers make no git writes, the lead keeps a bounded wait while agents run, one heavy e2e run at a time.
+- quality.md: two Definition of Done lines (event order in tests; seeded simulations and statistical tests).
+- state.md: stage code and `burn/` separately when committing QA fixes; merge the default branch into a second open run branch and re-check before integrating it.
+
 ## 0.2.0 · 2026-10-14
 
 - New skill `burn-switch`: switch to any project from a link, a local folder or a description. It finds the project, parks the current one, reviews the new one (code, tests, CI, issues, what's live, the repo's own agent instructions), asks the human what only they know, and sets up `burn/` so scheduled runs can take over.

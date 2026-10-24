@@ -124,6 +124,13 @@ See [budget.md](budget.md). In short: Desktop → `get_usage`; Codex → `usage.
 - **Codex**: ask Codex to spawn sub-agents, one per attendee, with the same briefs. Codex may limit how many children run at once (3 in testing). If a meeting has more attendees, run them in two batches with full briefs each; that's still independent and better than the fallback. Codex sub-agents have been generally available since March 2026. If spawning isn't available in this Codex setup, use the fallback.
 - **Fallback**: role-play each attendee in turn yourself, writing each position before you read the next role's charter. It's cheaper and less independent. Say in the minutes that you used the fallback.
 
+## Sub-agents doing work (builders, QA reviewers)
+
+- **Servers and test processes.** Every command that starts the product (a dev server, a sim, a preview) runs `cd <the agent's own worktree> && ...` in the same command and passes an explicit spare port; never rely on a default port or the shell's current folder. Prefer a server the harness can stop (Playwright's `webServer`, a background task) over a detached one, since killing a stray process may be refused.
+- **Reviewers don't write git state.** To test an older commit, use `git show <sha>:<path>` or a separate worktree, never `checkout` into the shared index. Builders run no state-changing git commands either; the lead commits and merges.
+- **The lead waits.** While sub-agents run, keep a bounded wait going (a polling loop on their output, a few minutes at a time) instead of ending the turn; an ended turn can hand the run back before the agents finish.
+- **One heavy run at a time.** Don't run a full e2e suite while a reviewer runs one; the load makes timing-sensitive specs fail falsely.
+
 ## Notifications
 
 See [notify.md](notify.md). Desktop can use the `PushNotification` tool directly. Everything else goes through `scripts/notify.py` (ntfy, webhook, Pushover).

@@ -109,7 +109,9 @@ State files always end up on the default branch, even when the code from a run d
 
 Pull before you start (`git pull --rebase`); the human may have answered inbox items or edited steering notes on GitHub. Push at the end of every run.
 
-**Keep `burn/` edits in their own commits**, never mixed with code. Then the state can always reach the default branch on its own. Either commit state on the default branch as you go (code on the run branch, state on the default branch), or edit it on the run branch and copy `burn/` across at the end as below. Pick one per run.
+**Keep `burn/` edits in their own commits**, never mixed with code. Then the state can always reach the default branch on its own. Either commit state on the default branch as you go (code on the run branch, state on the default branch), or edit it on the run branch and copy `burn/` across at the end as below. Pick one per run. Stage code and `burn/` separately when committing QA fixes; it's the moment they most often get mixed.
+
+**Two run branches open at once** (a second item built in its own worktree while the first is reviewed): after the first merges, merge the default branch into the second and re-run the full checks there before integrating it.
 
 **When the code doesn't merge** (a `pr` run, red tests, or open QA blockers), put the state on the default branch at the end of the run:
 

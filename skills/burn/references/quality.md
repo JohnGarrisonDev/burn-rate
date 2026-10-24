@@ -16,6 +16,8 @@ An item isn't `done` until all of these that apply are true.
 - It does what the backlog item says, including the edge cases a user would hit: empty states, errors, slow network, long text, mobile width.
 - **Tests:** new behavior has tests. Bug fixes have a test that failed before the fix. Tests check behavior, not implementation details.
 - **Checks:** the project's full test suite, linter, formatter and type checker pass. No new warnings. Don't disable a rule or skip a test to get green. If a rule is wrong, change it on purpose and record a decision.
+- **Event order in tests:** a test for a sequence of events follows the product's real order, and fails on the old code (check it against `git show HEAD~1:<file>`).
+- **Seeded simulations:** when a change moves a seeded simulation and a statistical test fails, compare the property across more seeds on the default branch and the run branch before changing code or test. A test change made this way is recorded as a decision.
 - **Cleanup:** no dead code, commented-out blocks, stray `console.log`/`print`, or TODOs without a backlog ID (`TODO(B-0051)`).
 - **Errors:** handled where they can happen. Users see a useful message, not a stack trace.
 - **Security:** inputs validated at the boundary. Queries parameterized. Auth checked on every protected route. No secrets in code or client bundles.
