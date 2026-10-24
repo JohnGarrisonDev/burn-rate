@@ -121,7 +121,7 @@ If the decision needs a human (spend, a launch, accepting terms), the decision i
 
 1. Finish the minutes (format below).
 2. **Decisions** go to `burn/DECISIONS.md` as a new entry if they change direction, set a policy, or would be expensive to reverse. Use the next free ID (`D-0012`) and the template's format. Set **Source:** to the minutes file, e.g. `meetings/2026-10-17-launch-pricing.md`. Routine weekly planning and retros usually don't need an entry.
-3. **Action items** go to `burn/BACKLOG.md` with new IDs (highest existing `B-` number across all sections, plus one). Format: `- [todo] B-0043 · M · growth · Write pricing page copy — from meetings/2026-10-17-launch-pricing.md`. Rank them where they belong, not automatically at the top. Split anything L.
+3. **Action items** go to `burn/BACKLOG.md` with new IDs (highest existing `B-` number across all sections, plus one). Format: `- [todo] B-0043 · M · growth · Write pricing page copy — from meetings/2026-10-17-launch-pricing.md`. Rank them where they belong, not automatically at the top. Split anything L. Copy any rule from the meeting that limits a slice (when it ships, where it shows, what it leaves out) into that item's text, so a run that reads only the backlog doesn't miss it.
 4. Human items go to `burn/NEEDS_HUMAN.md`, with a notification.
 5. Record the meeting in this run's LOG entry: one line with the topic, decision and file.
 6. Commit: `meeting: launch-pricing (D-0012, B-0043..B-0045)`.

@@ -15,6 +15,7 @@ An item isn't `done` until all of these that apply are true.
 ### Code
 - It does what the backlog item says, including the edge cases a user would hit: empty states, errors, slow network, long text, mobile width.
 - **Tests:** new behavior has tests. Bug fixes have a test that failed before the fix. Tests check behavior, not implementation details.
+- **Failure paths:** each failure the code handles (not found, bad data, a dropped request) has at least one test that drives it. Name these cases in a builder's brief, not only through this list.
 - **Checks:** the project's full test suite, linter, formatter and type checker pass. No new warnings. Don't disable a rule or skip a test to get green. If a rule is wrong, change it on purpose and record a decision.
 - **Cleanup:** no dead code, commented-out blocks, stray `console.log`/`print`, or TODOs without a backlog ID (`TODO(B-0051)`).
 - **Errors:** handled where they can happen. Users see a useful message, not a stack trace.
