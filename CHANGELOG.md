@@ -2,6 +2,11 @@
 
 Versions follow semver. Patch for fixes, minor for new behavior, major for anything that changes the state file format or config in a way that needs migrating.
 
+## 0.2.1 · 2026-10-24
+
+- Quality: the Definition of Done asks for a test that drives each failure path the code handles, and for builder briefs to name those cases.
+- Meetings: a rule that limits a slice (when it ships, where it shows) is copied into that slice's backlog item, so a run reading only the backlog follows it.
+
 ## 0.2.0 · 2026-10-14
 
 - New skill `burn-switch`: switch to any project from a link, a local folder or a description. It finds the project, parks the current one, reviews the new one (code, tests, CI, issues, what's live, the repo's own agent instructions), asks the human what only they know, and sets up `burn/` so scheduled runs can take over.
